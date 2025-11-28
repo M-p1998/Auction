@@ -109,7 +109,7 @@ public class AuctionController: ControllerBase
         if (auction == null)
             return NotFound();
 
-        // ✔ Only the auction creator can delete it
+        // Only the admin can delete it
         if (auction.Seller != User.Identity.Name)
             return Unauthorized("You cannot delete another admin’s auction");
 
