@@ -13,7 +13,7 @@ public class Item
     public int Mileage { get; set; }
     public string ImageUrl { get; set; }
 
-    // one to many (one auction --> many items
+    // one to one 
     public Auction Auction { get; set; }
     public Guid AuctionId { get; set; }
 }

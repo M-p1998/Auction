@@ -2,6 +2,7 @@ using AuctionService.Data;
 using AuctionService.DTOs;
 using AuctionService.Entities;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,25 +41,49 @@ public class AuctionController: ControllerBase
         return _mapper.Map<AuctionDto>(auction);
     }
     
+    [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto auctionDto)
+    public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto dto)
     {
-        var auction = _mapper.Map<Auction>(auctionDto);
-        
-        // add current user as seller
-        auction.Seller = "test";
+        var auction = new Auction
+        {
+            Id = Guid.NewGuid(),
+            ReservePrice = dto.ReservePrice,
+            AuctionEnd = dto.AuctionEnd,
+            Status = Status.Live,
+            Seller = User.Identity.Name,
+            Item = new Item
+            {
+                Id = Guid.NewGuid(),
+                Make = dto.Make,
+                Model = dto.Model,
+                Year = dto.Year,
+                Color = dto.Color,
+                Mileage = dto.Mileage,
+                ImageUrl = dto.ImageUrl
+            }
+        };
+
         _context.Auctions.Add(auction);
-        var result = await _context.SaveChangesAsync() > 0;
-        if (!result) return BadRequest("Could not save changes to the DB");
-        return CreatedAtAction(nameof(GetAuctionById), new {auction.Id}, _mapper.Map<AuctionDto>(auction));
+        var success = await _context.SaveChangesAsync() > 0;
+
+        if (!success) return BadRequest("Could not save auction");
+
+        return CreatedAtAction(nameof(GetAuctionById), new { id = auction.Id },
+            _mapper.Map<AuctionDto>(auction));
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateAuction(Guid id, UpdateAuctionDto updateAuctionDto)
     {
         var auction = await _context.Auctions.Include(x => x.Item)
             .FirstOrDefaultAsync(x => x.Id == id);
         if(auction == null)return NotFound();
+
+         // Only the admin can update it
+        if (auction.Seller != User.Identity.Name)
+            return Unauthorized("You cannot update another admin’s auction");
         
         auction.Item.Make = updateAuctionDto.Make ??  auction.Item.Make;
         auction.Item.Model = updateAuctionDto.Model ??  auction.Item.Model;
@@ -66,21 +91,35 @@ public class AuctionController: ControllerBase
         auction.Item.Mileage = updateAuctionDto.Mileage ??  auction.Item.Mileage;
         auction.Item.Year = updateAuctionDto.Year ??  auction.Item.Year;
 
-        var result = await _context.SaveChangesAsync() > 0;
-        if(result) return Ok();
-        return BadRequest("Problem saving changes");
+        auction.UpdatedAt = DateTime.UtcNow;
+
+        var success = await _context.SaveChangesAsync() > 0;
+        if(!success) return BadRequest("Could not save changes");
+        return Ok("Auction updated successfully");
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteAuction(Guid id)
     {
-        var auction = await _context.Auctions.FindAsync(id);
-        if(auction == null) return NotFound(); 
-        // check seller == username
+        var auction = await _context.Auctions
+        .Include(a => a.Item)
+        .FirstOrDefaultAsync(a => a.Id == id);
+
+        if (auction == null)
+            return NotFound();
+
+        // ✔ Only the auction creator can delete it
+        if (auction.Seller != User.Identity.Name)
+            return Unauthorized("You cannot delete another admin’s auction");
+
         _context.Auctions.Remove(auction);
-        var result = await _context.SaveChangesAsync() > 0;
-        if(!result) return  BadRequest("Could not update DB");
-        return Ok();
+        var success = await _context.SaveChangesAsync() > 0;
+
+        if (!success)
+            return BadRequest("Failed to delete auction");
+
+        return Ok("Auction deleted successfully");
         
     }
     
