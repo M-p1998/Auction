@@ -1,6 +1,7 @@
 using AuctionService.Data;
 using AuctionService.DTOs;
 using AuctionService.Entities;
+using AuctionService.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +16,12 @@ public class AuctionController: ControllerBase
 
     private readonly AuctionDbContext _context;
     private readonly IMapper _mapper;
-    public AuctionController(AuctionDbContext context, IMapper mapper)
+    private readonly SearchSyncService _searchSync;
+    public AuctionController(AuctionDbContext context, IMapper mapper, SearchSyncService searchSync)
     {
         _context = context;
         _mapper = mapper;
+        _searchSync = searchSync;
     }
 
     [HttpGet]
@@ -63,12 +66,13 @@ public class AuctionController: ControllerBase
                 ImageUrl = dto.ImageUrl
             }
         };
-
+        // auction.Seller = "admin";
         _context.Auctions.Add(auction);
         var success = await _context.SaveChangesAsync() > 0;
 
         if (!success) return BadRequest("Could not save auction");
-
+         // sync with Search service (Mongo)
+        await _searchSync.SyncWithSearchService(auction);
         return CreatedAtAction(nameof(GetAuctionById), new { id = auction.Id },
             _mapper.Map<AuctionDto>(auction));
     }
@@ -94,6 +98,7 @@ public class AuctionController: ControllerBase
         auction.UpdatedAt = DateTime.UtcNow;
 
         var success = await _context.SaveChangesAsync() > 0;
+        await _searchSync.SyncWithSearchService(auction);
         if(!success) return BadRequest("Could not save changes");
         return Ok("Auction updated successfully");
     }

@@ -1,6 +1,7 @@
 using System.Text;
 using AuctionService.Auth;
 using AuctionService.Data;
+using AuctionService.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,6 +14,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
 builder.Services.AddFluentValidationAutoValidation();
+
+builder.Services.AddHttpClient<SearchSyncService>();
+builder.Services.AddScoped<InitialMongoSync>();
 
 builder.Services.AddDbContext<AuctionDbContext>(opt =>
 {
@@ -41,7 +45,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 var app = builder.Build();
 
-
 app.UseAuthentication();  
 app.UseAuthorization();
 
@@ -49,7 +52,15 @@ app.MapControllers();
 
 try
 {
+    // Initialize PostgreSQL DB
     DbInitializer.InitDb(app);
+
+// Initial MongoDB Sync
+    using (var scope = app.Services.CreateScope())
+    {
+        var sync = scope.ServiceProvider.GetRequiredService<InitialMongoSync>();
+        await sync.SyncAllAsync();
+    }
 }
 catch (Exception e)
 {
