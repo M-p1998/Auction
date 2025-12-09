@@ -7,6 +7,8 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MassTransit;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,27 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 
 builder.Services.AddHttpClient<SearchSyncService>();
+
+var rabbitSection = builder.Configuration.GetSection("RabbitMq");
+var rabbitHost = rabbitSection["Host"];
+var rabbitUser = rabbitSection["Username"];
+var rabbitPass = rabbitSection["Password"];
+builder.Services.AddMassTransit(x =>
+{
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(rabbitHost, "/", h =>
+        {
+            h.Username(rabbitUser);
+            h.Password(rabbitPass);
+        });
+
+        // Optional: global retry on consumers hosted here (if any)
+        cfg.ConfigureEndpoints(context);
+    });
+});
+
 builder.Services.AddScoped<InitialMongoSync>();
 
 builder.Services.AddDbContext<AuctionDbContext>(opt =>
