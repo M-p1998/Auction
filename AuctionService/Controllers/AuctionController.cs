@@ -1,8 +1,14 @@
 using AuctionService.Data;
 using AuctionService.DTOs;
 using AuctionService.Entities;
-using AuctionService.Services;
+// using AuctionService.Services;
+
+// using AuctionService.Services;
+
+// using AuctionService.Services;
 using AutoMapper;
+using Contracts;
+using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -16,13 +22,16 @@ public class AuctionController: ControllerBase
 
     private readonly AuctionDbContext _context;
     private readonly IMapper _mapper;
-    private readonly SearchSyncService _searchSync;
-    public AuctionController(AuctionDbContext context, IMapper mapper, SearchSyncService searchSync)
+    // private readonly SearchSyncService _searchSync;
+    private readonly IPublishEndpoint _publishEndpoint;
+    public AuctionController(AuctionDbContext context, IMapper mapper,  IPublishEndpoint publishEndpoint)
     {
         _context = context;
         _mapper = mapper;
-        _searchSync = searchSync;
+        // _searchSync = searchSync;
+        _publishEndpoint = publishEndpoint;
     }
+   
 
     [HttpGet]
     public async Task<ActionResult<List<AuctionDto>>> GetAllAuctions()
@@ -70,12 +79,59 @@ public class AuctionController: ControllerBase
         _context.Auctions.Add(auction);
         var success = await _context.SaveChangesAsync() > 0;
 
+        var newAuction = _mapper.Map<Auction>(auction);
+        // publish event to RabbitMQ
+        // await _publishEndpoint.Publish(_mapper.Map<AuctionCreated>(newAuction));
+        await _publishEndpoint.Publish(new AuctionCreated
+        {
+            Id = auction.Id,
+            AuctionEnd = auction.AuctionEnd,
+            ReservePrice = auction.ReservePrice,
+            Make = auction.Item.Make,
+            Model = auction.Item.Model,
+            Year = auction.Item.Year,
+            Mileage = auction.Item.Mileage,
+            Color = auction.Item.Color,
+            ImageUrl = auction.Item.ImageUrl
+        });
         if (!success) return BadRequest("Could not save auction");
-         // sync with Search service (Mongo)
-        await _searchSync.SyncWithSearchService(auction);
+         // sync with Search service (MongoDB)
+        // await _searchSync.SyncWithSearchService(auction);
         return CreatedAtAction(nameof(GetAuctionById), new { id = auction.Id },
-            _mapper.Map<AuctionDto>(auction));
+            newAuction);
     }
+
+    // [Authorize(Roles = "Admin")]
+    // [HttpPost]
+    // public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto dto)
+    // {
+    //     var auction = _mapper.Map<Auction>(dto);
+    //     auction.Seller = "admin"; // Your logic
+    //     auction.CreatedAt = DateTime.UtcNow;
+
+    //     await _context.Auctions.AddAsync(auction);
+
+    //     var result = await _context.SaveChangesAsync() > 0;
+
+    //     if (!result) return BadRequest("Could not save auction");
+
+    //     // 🔥 Publish AuctionCreated event
+    //     await _publishEndpoint.Publish(new AuctionCreated
+    //     {
+    //         Id = auction.Id,
+    //         ReservePrice = auction.ReservePrice,
+    //         AuctionEnd = auction.AuctionEnd,
+    //         Make = auction.Item.Make,
+    //         Model = auction.Item.Model,
+    //         Year = auction.Item.Year,
+    //         Mileage = auction.Item.Mileage,
+    //         Color = auction.Item.Color,
+    //         ImageUrl = auction.Item.ImageUrl
+    //     });
+
+    //     return Ok(_mapper.Map<AuctionDto>(auction));
+    // }
+
 
     [Authorize(Roles = "Admin")]
     [HttpPut("{id}")]
@@ -98,7 +154,7 @@ public class AuctionController: ControllerBase
         auction.UpdatedAt = DateTime.UtcNow;
 
         var success = await _context.SaveChangesAsync() > 0;
-        await _searchSync.SyncWithSearchService(auction);
+        // await _searchSync.SyncWithSearchService(auction);
         if(!success) return BadRequest("Could not save changes");
         return Ok("Auction updated successfully");
     }

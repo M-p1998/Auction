@@ -1,13 +1,15 @@
 using System.Text;
 using AuctionService.Auth;
 using AuctionService.Data;
-using AuctionService.Services;
+// using AuctionService.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using MassTransit;
+using Contracts;
+using AuctionService.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,29 +19,9 @@ builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 
-builder.Services.AddHttpClient<SearchSyncService>();
+// builder.Services.AddHttpClient<SearchSyncService>();
 
-var rabbitSection = builder.Configuration.GetSection("RabbitMq");
-var rabbitHost = rabbitSection["Host"];
-var rabbitUser = rabbitSection["Username"];
-var rabbitPass = rabbitSection["Password"];
-builder.Services.AddMassTransit(x =>
-{
-
-    x.UsingRabbitMq((context, cfg) =>
-    {
-        cfg.Host(rabbitHost, "/", h =>
-        {
-            h.Username(rabbitUser);
-            h.Password(rabbitPass);
-        });
-
-        // Optional: global retry on consumers hosted here (if any)
-        cfg.ConfigureEndpoints(context);
-    });
-});
-
-builder.Services.AddScoped<InitialMongoSync>();
+// builder.Services.AddScoped<InitialMongoSync>();
 
 builder.Services.AddDbContext<AuctionDbContext>(opt =>
 {
@@ -51,6 +33,37 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]);
 // var jwtKey = builder.Configuration["JwtSettings:Key"] ?? "DEV_SECRET_KEY_123456789";
 var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]);
+
+// builder.Services.AddMassTransit(x =>
+// {
+//     x.UsingRabbitMq((context, cfg) =>
+//     {
+//         cfg.Host(builder.Configuration["RabbitMq:Host"], "/", h =>
+//         {
+//             h.Username(builder.Configuration["RabbitMq:Username"]);
+//             h.Password(builder.Configuration["RabbitMq:Password"]);
+//         });
+//     });
+// });
+
+builder.Services.AddMassTransit(x =>
+{
+    // register all consumers from this service (even if none exists)
+    // x.AddConsumersFromNamespaceContaining<Program>();
+    // x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(builder.Configuration["RabbitMq:Host"], "/", h =>
+        {
+            h.Username(builder.Configuration["RabbitMq:Username"]);
+            h.Password(builder.Configuration["RabbitMq:Password"]);
+        });
+
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -79,11 +92,11 @@ try
     DbInitializer.InitDb(app);
 
 // Initial MongoDB Sync
-    using (var scope = app.Services.CreateScope())
-    {
-        var sync = scope.ServiceProvider.GetRequiredService<InitialMongoSync>();
-        await sync.SyncAllAsync();
-    }
+    // using (var scope = app.Services.CreateScope())
+    // {
+    //     var sync = scope.ServiceProvider.GetRequiredService<InitialMongoSync>();
+    //     await sync.SyncAllAsync();
+    // }
 }
 catch (Exception e)
 {
@@ -96,41 +109,3 @@ app.Run();
 
 
 
-
-// var builder = WebApplication.CreateBuilder(args);
-
-// builder.Services.AddControllers();
-
-// // JWT Authentication
-// var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]);
-
-// builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//     .AddJwtBearer(options =>
-//     {
-//         options.TokenValidationParameters = new TokenValidationParameters
-//         {
-//             ValidateIssuer = false,
-//             ValidateAudience = false,
-//             ValidateLifetime = true,
-//             ValidateIssuerSigningKey = true,
-//             IssuerSigningKey = new SymmetricSecurityKey(key),
-//             ClockSkew = TimeSpan.Zero
-//         };
-//     });
-
-// // Authorization
-// builder.Services.AddAuthorization();
-
-// var app = builder.Build();
-
-// app.UseAuthentication();
-// app.UseAuthorization();
-
-// app.MapControllers();
-
-// if (app.Environment.IsDevelopment())
-// {
-//     DbInitializer.InitDb(app);
-// }
-
-// app.Run();

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace AuctionService.Entities;
 
@@ -12,8 +13,10 @@ public class Item
     public string Color { get; set; }
     public int Mileage { get; set; }
     public string ImageUrl { get; set; }
+    public Guid AuctionId { get; set; }
 
     // one to one 
+    [JsonIgnore]
     public Auction Auction { get; set; }
-    public Guid AuctionId { get; set; }
+
 }
