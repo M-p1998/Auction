@@ -38,7 +38,7 @@ builder.Services.AddMassTransit(x =>
     // 👇 REGISTER THE CONSUMER
     // x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
     x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
-    // x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -47,6 +47,15 @@ builder.Services.AddMassTransit(x =>
             h.Username(builder.Configuration["RabbitMq:Username"]);
             h.Password(builder.Configuration["RabbitMq:Password"]);
         });
+        // Retry (3 attempts, 2s apart)
+        cfg.UseMessageRetry(r =>
+        {
+            r.Interval(3, TimeSpan.FromSeconds(2));
+        });
+
+        // outbox on consumer side to avoid duplicate writes
+        cfg.UseInMemoryOutbox();
+
 
         // 👇 CONNECT CONSUMER TO RABBIT QUEUE
         cfg.ConfigureEndpoints(context);

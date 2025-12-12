@@ -14,6 +14,9 @@ namespace SearchService.Helpers
         {
             CreateMap<AuctionCreated, Item>()
                 .ForMember(dest => dest.ID, opt => opt.MapFrom(src => src.Id.ToString()));
+            
+            CreateMap<AuctionUpdated, Item>()
+            .ForMember(dest => dest.AuctionId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }

@@ -14,4 +14,6 @@ public class AuctionDbContext : DbContext
     public DbSet<Auction> Auctions { get; set; }    
     public DbSet<User> Users { get; set; }
     public DbSet<Admin> Admins { get; set; }
+    public DbSet<OutboxMessage> OutboxMessages { get; set; }
+
 }

@@ -27,6 +27,12 @@ builder.Services.AddDbContext<AuctionDbContext>(opt =>
 {
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    // options.InstanceName = "auction_";
+});
+builder.Services.AddHostedService<OutboxPublisher>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // 🔐 JWT Authentication Setup
@@ -51,8 +57,9 @@ builder.Services.AddMassTransit(x =>
     // register all consumers from this service (even if none exists)
     // x.AddConsumersFromNamespaceContaining<Program>();
     // x.AddConsumersFromNamespaceContaining<AuctionCreatedConsumer>();
-    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
 
+
+    // x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(builder.Configuration["RabbitMq:Host"], "/", h =>
@@ -61,9 +68,10 @@ builder.Services.AddMassTransit(x =>
             h.Password(builder.Configuration["RabbitMq:Password"]);
         });
 
-        cfg.ConfigureEndpoints(context);
+        // cfg.ConfigureEndpoints(context);
     });
 });
+
 
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -79,6 +87,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddAuthorization();
+
 var app = builder.Build();
 
 app.UseAuthentication();  
