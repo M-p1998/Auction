@@ -60,6 +60,7 @@ builder.Services.AddMassTransit(x =>
 
 
     // x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(builder.Configuration["RabbitMq:Host"], "/", h =>
@@ -68,7 +69,8 @@ builder.Services.AddMassTransit(x =>
             h.Password(builder.Configuration["RabbitMq:Password"]);
         });
 
-        // cfg.ConfigureEndpoints(context);
+        cfg.ConfigureEndpoints(context);
+        // cfg.UseEntityFrameworkOutbox<AuctionDbContext>(context);
     });
 });
 

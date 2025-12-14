@@ -50,14 +50,19 @@ builder.Services.AddMassTransit(x =>
         // Retry (3 attempts, 2s apart)
         cfg.UseMessageRetry(r =>
         {
-            r.Interval(3, TimeSpan.FromSeconds(2));
+            r.Interval(10, TimeSpan.FromSeconds(5));
         });
 
         // outbox on consumer side to avoid duplicate writes
         cfg.UseInMemoryOutbox();
 
 
-        // 👇 CONNECT CONSUMER TO RABBIT QUEUE
+        // CONNECT CONSUMER TO RABBIT QUEUE
+        // cfg.ConfigureEndpoints(context);
+        // cfg.ReceiveEndpoint("auction-created", e =>
+        // {
+        //     e.ConfigureConsumer<AuctionCreatedConsumer>(context);
+        // });
         cfg.ConfigureEndpoints(context);
     });
 });

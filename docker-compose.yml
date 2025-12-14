@@ -15,9 +15,9 @@ services:
     - "5672:5672"
     - "15672:15672"
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      test: ["CMD", "rabbitmq-diagnostics", "status"]
       interval: 10s
-      timeout: 5s
+      timeout: 10s
       retries: 5
 
   mongo:
@@ -28,9 +28,15 @@ services:
 
   auction-service:
     image: auction-auction-service
+    build:
+      context: .
+      dockerfile: AuctionService/Dockerfile
     environment:
     - ASPNETCORE_ENVIRONMENT=Development
     - ASPNETCORE_URLS=http://+:7001 
+    - RabbitMq__Host=rabbitmq
+    - RabbitMq__Username=guest
+    - RabbitMq__Password=guest
     ports:
       - "7001:7001"
     depends_on:
@@ -43,9 +49,16 @@ services:
 
   search-service:
     image: auction-search-service
+    build:
+      context: .
+      dockerfile: SearchService/Dockerfile
     environment:
     - ASPNETCORE_ENVIRONMENT=Development
     - ASPNETCORE_URLS=http://+:7002
+    - RabbitMq__Host=rabbitmq
+    - RabbitMq__Username=guest
+    - RabbitMq__Password=guest
+   
     ports:
       - "7002:7002"
     depends_on:
@@ -56,6 +69,9 @@ services:
 
   gateway-service:
     image: auction-gateway-service
+    build:
+      context: .
+      dockerfile: GatewayService/Dockerfile
     environment:
     - ASPNETCORE_ENVIRONMENT=Development
     - ASPNETCORE_URLS=http://+:6001

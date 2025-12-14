@@ -111,9 +111,9 @@ public class AuctionController: ControllerBase
         };
         // auction.Seller = "admin";
         _context.Auctions.Add(auction);
-        var success = await _context.SaveChangesAsync() > 0;
+        // var success = await _context.SaveChangesAsync() > 0;
 
-        var newAuction = _mapper.Map<Auction>(auction);
+        // var newAuction = _mapper.Map<Auction>(auction);
         // publish event to RabbitMQ
         // await _publishEndpoint.Publish(_mapper.Map<AuctionCreated>(newAuction));
 
@@ -131,15 +131,27 @@ public class AuctionController: ControllerBase
         };
         // await _publishEndpoint.Publish(createdEvent);
 
-        var outbox = new OutboxMessage
+        // var outbox = new OutboxMessage
+        // {
+        //     Id = Guid.NewGuid(),
+        //     Type = nameof(AuctionCreated),
+        //     Content = JsonSerializer.Serialize(createdEvent),
+        // };
+
+        // Save event to OUTBOX ONLY
+        _context.OutboxMessages.Add(new OutboxMessage
         {
             Id = Guid.NewGuid(),
             Type = nameof(AuctionCreated),
             Content = JsonSerializer.Serialize(createdEvent),
-        };
-        _context.OutboxMessages.Add(outbox);
-        await _context.SaveChangesAsync();
+
+        });
+
+        var success = await _context.SaveChangesAsync() > 0;
+        // _context.OutboxMessages.Add(outbox);
+        // await _context.SaveChangesAsync();
         if (!success) return BadRequest("Could not save auction");
+        var newAuction = _mapper.Map<AuctionDto>(auction);
          // sync with Search service (MongoDB)
         // await _searchSync.SyncWithSearchService(auction);
         return CreatedAtAction(nameof(GetAuctionById), new { id = auction.Id },
