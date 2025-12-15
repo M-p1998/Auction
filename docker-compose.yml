@@ -12,8 +12,10 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     ports:
-    - "5672:5672"
-    - "15672:15672"
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "status"]
       interval: 10s
@@ -80,4 +82,24 @@ services:
     depends_on:
       - auction-service
       - search-service
+
+  bid-service:
+    build:
+      context: .
+      dockerfile: BidService/Dockerfile
+    image: auction-bid-service
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:7003
+    ports:
+      - "7003:7003"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+  
+volumes:
+  rabbitmq_data:
+
 

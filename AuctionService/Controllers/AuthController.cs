@@ -41,9 +41,17 @@ namespace AuctionService.Controllers;
             if (exists){
                 return BadRequest("User already exists");
             }
-            var user = new User{
+            // plain text
+            // var user = new User{
+            //     Email = request.Email,
+            //     Password = request.Password
+            // };
+            var hashedPassword = PasswordHasher.HashPassword(request.Password);
+
+            var user = new User
+            {
                 Email = request.Email,
-                Password = request.Password
+                Password = hashedPassword // Store hashed password
             };
             _context.Users.Add(user);
             var result = await _context.SaveChangesAsync() > 0;
@@ -52,26 +60,51 @@ namespace AuctionService.Controllers;
                 
         }
 
+        // [HttpPost("login-user")]
+        // public async Task<IActionResult> LoginUser(LoginDto request)
+        // {
+        //     var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email && u.Password == request.Password);
+
+        //     if (user == null)
+        //     {
+        //         return Unauthorized("Invalid email or password");
+        //     }
+        //     return Ok("User logged in successfully");
+        // }
+
+        // [HttpGet("admins")]
+        // public async Task<IActionResult> GetAdmins()
+        // {
+        //     var admins = await _context.Admins
+        //     .Select(a => new { a.Id, a.Email })
+        //     .ToListAsync();
+
+        //     return Ok(admins);
+        // }
+
         [HttpPost("login-user")]
         public async Task<IActionResult> LoginUser(LoginDto request)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == request.Email && u.Password == request.Password);
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email);
 
             if (user == null)
+                return Unauthorized("User not found!");
+
+            if (!PasswordHasher.VerifyPassword(request.Password, user.Password))
+                return Unauthorized("Invalid password");
+
+            var token = JwtHelper.GenerateToken(
+                user.Email,
+                "User",              // role
+                _config
+            );
+
+            return Ok(new
             {
-                return Unauthorized("Invalid email or password");
-            }
-            return Ok("User logged in successfully");
-        }
-
-        [HttpGet("admins")]
-        public async Task<IActionResult> GetAdmins()
-        {
-            var admins = await _context.Admins
-            .Select(a => new { a.Id, a.Email })
-            .ToListAsync();
-
-            return Ok(admins);
+                message = "User logged in successfully",
+                token = token
+            });
         }
 
         [HttpPost("login-admin")]

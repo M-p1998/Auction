@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using MassTransit;
 using Contracts;
 using AuctionService.Services;
+using AuctionService.Consumers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,6 +61,7 @@ builder.Services.AddMassTransit(x =>
 
 
     // x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
+    x.AddConsumer<BidPlacedConsumer>();
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
     x.UsingRabbitMq((context, cfg) =>
     {
