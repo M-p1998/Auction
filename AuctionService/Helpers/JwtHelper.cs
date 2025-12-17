@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace AuctionService.Helpers
@@ -55,5 +56,7 @@ namespace AuctionService.Helpers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+       
     }
 }

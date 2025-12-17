@@ -15,5 +15,14 @@ namespace BidService.Data
         }
 
         public DbSet<Bid> Bids { get; set; }
+        public DbSet<AuctionSnapshot> AuctionSnapshots { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<AuctionSnapshot>()
+                .Property(x => x.Status)
+                .HasConversion<string>();
+        }
+
     }
 }

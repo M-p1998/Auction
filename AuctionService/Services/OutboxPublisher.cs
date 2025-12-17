@@ -7,6 +7,11 @@ using AuctionService.Data;
 using Contracts;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Threading;
+
 
 namespace AuctionService.Services
 {
@@ -69,6 +74,8 @@ namespace AuctionService.Services
             await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
         }
     }
-}
+
+       
+    }
 
 }

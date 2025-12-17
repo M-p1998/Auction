@@ -1,7 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 using System.Text.Json;
+using System.Threading.Tasks;
 using AuctionService.Data;
 using AuctionService.DTOs;
 using AuctionService.Entities;
+
 // using AuctionService.Services;
 
 // using AuctionService.Services;
@@ -9,6 +15,7 @@ using AuctionService.Entities;
 // using AuctionService.Services;
 using AutoMapper;
 using Contracts;
+using Contracts.Enums;
 using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -95,9 +102,9 @@ public class AuctionController: ControllerBase
         {
             Id = Guid.NewGuid(),
             ReservePrice = dto.ReservePrice,
-            AuctionEnd = dto.AuctionEnd,
-            Status = Status.Live,
-            Seller = User.Identity.Name,
+            AuctionEnd = dto.AuctionEnd.ToUniversalTime(),
+            Status = AuctionStatus.Live,
+            Seller = User.FindFirstValue(ClaimTypes.Email),
             Item = new Item
             {
                 Id = Guid.NewGuid(),
@@ -172,13 +179,18 @@ public class AuctionController: ControllerBase
         if (auction.Seller != User.Identity.Name)
             return Unauthorized("You cannot update another admin’s auction");
         
-        auction.Item.Make = updateAuctionDto.Make ??  auction.Item.Make;
-        auction.Item.Model = updateAuctionDto.Model ??  auction.Item.Model;
-        auction.Item.Color = updateAuctionDto.Color ??  auction.Item.Color;
-        auction.Item.Mileage = updateAuctionDto.Mileage ??  auction.Item.Mileage;
-        auction.Item.Year = updateAuctionDto.Year ??  auction.Item.Year;
-        // auction.AuctionEnd  = updateAuctionDto.AuctionEnd; ?? auction.Item.AuctionEnd;
-        // auction.ReservePrice= updateAuctionDto.ReservePrice ?? auction.ReservePrice;
+        auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
+        auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
+        auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
+        auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
+        auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
+        // auction.AuctionEnd  = updateAuctionDto.AuctionEnd ?? auction.AuctionEnd;
+        if (updateAuctionDto.AuctionEnd.HasValue)
+        {
+            auction.AuctionEnd = updateAuctionDto.AuctionEnd.Value.ToUniversalTime();
+        }
+
+        auction.ReservePrice= updateAuctionDto.ReservePrice ?? auction.ReservePrice;
         auction.UpdatedAt = DateTime.UtcNow;
 
         var success = await _context.SaveChangesAsync() > 0;

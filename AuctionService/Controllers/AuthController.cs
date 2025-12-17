@@ -9,6 +9,7 @@ using AuctionService.Helpers;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace AuctionService.Controllers;
 
@@ -51,7 +52,7 @@ namespace AuctionService.Controllers;
             var user = new User
             {
                 Email = request.Email,
-                Password = hashedPassword // Store hashed password
+                Password = hashedPassword 
             };
             _context.Users.Add(user);
             var result = await _context.SaveChangesAsync() > 0;

@@ -11,6 +11,10 @@ using MassTransit;
 using Contracts;
 using AuctionService.Services;
 using AuctionService.Consumers;
+using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -34,6 +38,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
     // options.InstanceName = "auction_";
 });
 builder.Services.AddHostedService<OutboxPublisher>();
+builder.Services.AddHostedService<AuctionEndingWorker>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // 🔐 JWT Authentication Setup
@@ -116,6 +121,11 @@ catch (Exception e)
     Console.WriteLine(e);
 }
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AuctionDbContext>();
+    db.Database.Migrate();
+}
 
 app.Run();
 

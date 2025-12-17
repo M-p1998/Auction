@@ -16,4 +16,12 @@ public class AuctionDbContext : DbContext
     public DbSet<Admin> Admins { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
 
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        builder.Entity<Auction>()
+            .Property(a => a.Status)
+            .HasConversion<string>()
+            .HasMaxLength(50);
+    }
+
 }

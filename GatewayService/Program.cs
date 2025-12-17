@@ -28,7 +28,7 @@ builder.Services
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 builder.Services.AddAuthorization();
-
+                            
 var app = builder.Build();
 
 app.UseAuthentication();

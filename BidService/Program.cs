@@ -19,6 +19,7 @@ builder.Services.AddDbContext<BidDbContext>(opt =>
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<AuctionCreatedConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(builder.Configuration["RabbitMq:Host"], "/", h =>
@@ -26,6 +27,7 @@ builder.Services.AddMassTransit(x =>
             h.Username(builder.Configuration["RabbitMq:Username"]);
             h.Password(builder.Configuration["RabbitMq:Password"]);
         });
+        cfg.ConfigureEndpoints(context);
     });
 });
 
@@ -46,6 +48,11 @@ builder.Services
             )
         };
     });
+builder.Services.AddHttpClient("auction", client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["AuctionServiceUrl"]!);
+});
+
 
 builder.Services.AddAuthorization();
 
