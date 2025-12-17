@@ -234,31 +234,49 @@ public class AuctionController: ControllerBase
             return NotFound();
 
         // Only the admin can delete it
-        if (auction.Seller != User.Identity.Name)
-            return Unauthorized("You cannot delete another admin’s auction");
+        // if (auction.Seller != User.Identity.Name)
+        //     return Unauthorized("You cannot delete another admin’s auction");
+
+        // _context.Auctions.Remove(auction);
+        // var success = await _context.SaveChangesAsync() > 0;
+
+        // if (!success)
+        //     return BadRequest("Failed to delete auction");
+
+        //  // Publish AuctionDeleted event
+        // // await _publishEndpoint.Publish(new AuctionDeleted { Id = id });
+        // var deleteEvent = new AuctionDeleted
+        // {
+        //     Id = auction.Id
+        // };
+        // var outbox = new OutboxMessage
+        // {
+        //     Id = Guid.NewGuid(),
+        //     Type = nameof(AuctionDeleted),
+        //     Content = JsonSerializer.Serialize(deleteEvent),
+        // };
+
+        // _context.OutboxMessages.Add(outbox);
+        // await _context.SaveChangesAsync();
+        // await _cache.RemoveAsync($"auction:{id}");
+
+        // return Ok("Auction deleted successfully");
+        if (auction.Status == AuctionStatus.Live)
+        return BadRequest("Cannot delete a live auction");
 
         _context.Auctions.Remove(auction);
-        var success = await _context.SaveChangesAsync() > 0;
 
-        if (!success)
-            return BadRequest("Failed to delete auction");
+        var deleteEvent = new AuctionDeleted { Id = auction.Id };
 
-         // Publish AuctionDeleted event
-        // await _publishEndpoint.Publish(new AuctionDeleted { Id = id });
-        var deleteEvent = new AuctionDeleted
-        {
-            Id = auction.Id
-        };
-        var outbox = new OutboxMessage
+        _context.OutboxMessages.Add(new OutboxMessage
         {
             Id = Guid.NewGuid(),
             Type = nameof(AuctionDeleted),
-            Content = JsonSerializer.Serialize(deleteEvent),
-        };
+            Content = JsonSerializer.Serialize(deleteEvent)
+        });
 
-        _context.OutboxMessages.Add(outbox);
         await _context.SaveChangesAsync();
-        await _cache.RemoveAsync($"auction:{id}");
+        await _cache.RemoveAsync($"auction:{auction.Id}");
 
         return Ok("Auction deleted successfully");
         

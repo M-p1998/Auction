@@ -34,19 +34,46 @@ namespace AuctionService.Helpers
 
         //     return new JwtSecurityTokenHandler().WriteToken(token);
         // }
+
+        // public static string GenerateToken(string email, string role, IConfiguration config)
+        // {
+        //     var key = Encoding.UTF8.GetBytes(config["JwtSettings:Key"]);
+
+        //     var claims = new List<Claim>
+        //     {
+        //         new Claim(ClaimTypes.Email, email),
+        //         new Claim(ClaimTypes.Role, role) // IMPORTANT
+        //     };
+
+        //     var creds = new SigningCredentials(
+        //         new SymmetricSecurityKey(key),
+        //         SecurityAlgorithms.HmacSha256);
+
+        //     var token = new JwtSecurityToken(
+        //         claims: claims,
+        //         expires: DateTime.UtcNow.AddHours(3),
+        //         signingCredentials: creds
+        //     );
+
+        //     return new JwtSecurityTokenHandler().WriteToken(token);
+        // }
+
+
         public static string GenerateToken(string email, string role, IConfiguration config)
         {
             var key = Encoding.UTF8.GetBytes(config["JwtSettings:Key"]);
 
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.Name, email),   // ✅ REQUIRED
                 new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.Role, role) // IMPORTANT
+                new Claim(ClaimTypes.Role, role)     // 🔑 REQUIRED
             };
 
             var creds = new SigningCredentials(
                 new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256);
+                SecurityAlgorithms.HmacSha256
+            );
 
             var token = new JwtSecurityToken(
                 claims: claims,
@@ -56,7 +83,6 @@ namespace AuctionService.Helpers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
        
     }
 }

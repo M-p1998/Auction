@@ -28,7 +28,7 @@ public class BidsController : ControllerBase
 
     [Authorize(Roles = "User")]
     [HttpPost]
-    public async Task<IActionResult> PlaceBid(CreateBidRequest request)
+    public async Task<IActionResult> PlaceBid([FromBody]CreateBidRequest request)
     {
         // var bidder = User.Identity?.Name ?? "anonymous";
         // var bidderEmail = User.FindFirst(ClaimTypes.Email)?.Value;
@@ -98,7 +98,7 @@ public class BidsController : ControllerBase
 
         // return Ok(bid);
 
-         var bidderEmail = User.FindFirstValue(ClaimTypes.Email);
+    var bidderEmail = User.FindFirstValue(ClaimTypes.Email);
     if (string.IsNullOrEmpty(bidderEmail))
         return Unauthorized("Invalid token");
 

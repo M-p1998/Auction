@@ -30,6 +30,7 @@ public class AuctionEndingWorker : BackgroundService
                 .Where(a =>
                     a.Status == AuctionStatus.Live &&
                     a.AuctionEnd <= now
+                    // a.AuctionEnd <= now.AddSeconds(-5)
                 )
                 .ToListAsync(stoppingToken);
 

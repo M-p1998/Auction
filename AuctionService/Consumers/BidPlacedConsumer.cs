@@ -24,7 +24,20 @@ public class BidPlacedConsumer : IConsumer<BidPlaced>
 
         if (auction == null) return;
         // Ignore bids after auction end
-        if (auction.Status != AuctionStatus.Live) return;
+        // if (auction.Status != AuctionStatus.Live) return;
+        if (auction.AuctionEnd < DateTime.UtcNow)
+        {   
+            // Allow updating WinningBidder, but NOT changing status
+            if (context.Message.Amount > auction.CurrentHighBid)
+            {
+                auction.CurrentHighBid = context.Message.Amount;
+                auction.WinningBidder = context.Message.Bidder;
+                auction.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync();
+            return;
+        }
 
         if (context.Message.Amount > auction.CurrentHighBid)
         {
