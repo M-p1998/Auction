@@ -1,0 +1,29 @@
+name: Auction CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore Auction.sln
+
+      - name: Build solution
+        run: dotnet build Auction.sln --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test Auction.sln --no-build --verbosity normal
