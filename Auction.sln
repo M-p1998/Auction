@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchService", "SearchServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{D1575AA5-BA99-42C2-A5E2-A6CAD1413387}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService", "NotificationService\NotificationService.csproj", "{7F79C6B7-E67C-459D-8A40-D4C4587378E9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,5 +27,9 @@ Global
 		{D1575AA5-BA99-42C2-A5E2-A6CAD1413387}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1575AA5-BA99-42C2-A5E2-A6CAD1413387}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1575AA5-BA99-42C2-A5E2-A6CAD1413387}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F79C6B7-E67C-459D-8A40-D4C4587378E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F79C6B7-E67C-459D-8A40-D4C4587378E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F79C6B7-E67C-459D-8A40-D4C4587378E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F79C6B7-E67C-459D-8A40-D4C4587378E9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

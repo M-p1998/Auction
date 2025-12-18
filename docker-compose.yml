@@ -97,6 +97,20 @@ services:
         condition: service_healthy
       postgres:
         condition: service_started
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: NotificationService/Dockerfile
+    image: auction-notification
+    container_name: notification-service
+    ports:
+      - "7004:8080"
+    depends_on:
+      - rabbitmq
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
   
 volumes:
   rabbitmq_data:
