@@ -22,8 +22,8 @@ jobs:
       - name: Build & push AuctionService
         uses: docker/build-push-action@v5
         with:
-          context: ./AuctionService
-          file: ./AuctionService/Dockerfile
+          context: .
+          file: AuctionService/Dockerfile
           push: true
           tags: mp5698/auction-auction-service:latest
 
@@ -31,8 +31,8 @@ jobs:
       - name: Build & push BidService
         uses: docker/build-push-action@v5
         with:
-          context: ./BidService
-          file: ./BidService/Dockerfile
+          context: .
+          file: BidService/Dockerfile
           push: true
           tags: mp5698/auction-bid-service:latest
 
@@ -40,8 +40,8 @@ jobs:
       - name: Build & push SearchService
         uses: docker/build-push-action@v5
         with:
-          context: ./SearchService
-          file: ./SearchService/Dockerfile
+          context: .
+          file: SearchService/Dockerfile
           push: true
           tags: mp5698/auction-search-service:latest
 
@@ -49,8 +49,8 @@ jobs:
       - name: Build & push GatewayService
         uses: docker/build-push-action@v5
         with:
-          context: ./GatewayService
-          file: ./GatewayService/Dockerfile
+          context: .
+          file: GatewayService/Dockerfile
           push: true
           tags: mp5698/auction-gateway-service:latest
 
@@ -58,7 +58,7 @@ jobs:
       - name: Build & push NotificationService
         uses: docker/build-push-action@v5
         with:
-          context: ./NotificationService
-          file: ./NotificationService/Dockerfile
+          context: .
+          file: NotificationService/Dockerfile
           push: true
           tags: mp5698/auction-notification:latest
