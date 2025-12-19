@@ -8,6 +8,7 @@ using AuctionService.Data;
 using AuctionService.DTOs;
 using AuctionService.Entities;
 using AuctionService.UnitTests.Helpers;
+using AuctionService.UnitTests.Mapping;
 using AutoMapper;
 using Contracts.Enums;
 using FluentAssertions;
@@ -30,14 +31,33 @@ namespace AuctionService.UnitTests.Controllers
 
         public AuctionControllerTests()
         {
-            _db = TestDbContextFactory.Create();
-
-            var mapperConfig = new MapperConfiguration(cfg =>
+                var mapperConfig = new MapperConfiguration(cfg =>
             {
-                cfg.AddMaps(typeof(Program).Assembly);
+                cfg.AddProfile<AuctionMappingProfile>();
             });
 
             _mapper = mapperConfig.CreateMapper();
+
+            // DbContext setup (usually InMemory)
+            var options = new DbContextOptionsBuilder<AuctionDbContext>()
+                .UseInMemoryDatabase(Guid.NewGuid().ToString())
+                .Options;
+
+            _db = new AuctionDbContext(options);
+
+            // mock Redis cache
+            _cache = new Mock<IDistributedCache>();
+
+            _cache
+                .Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((byte[])null);
+
+             // Mock MassTransit publish endpoint
+            _publishEndpoint = new Mock<IPublishEndpoint>();
+
+            _publishEndpoint
+                .Setup(p => p.Publish(It.IsAny<object>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
         }
 
         private AuctionController CreateController(bool isAdmin = true)
@@ -51,7 +71,7 @@ namespace AuctionService.UnitTests.Controllers
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Email, "admin@test.com"),
+                new Claim(ClaimTypes.Email, "admin@auction.com"),
                 new Claim(ClaimTypes.Role, isAdmin ? "Admin" : "User")
             };
 
@@ -69,7 +89,6 @@ namespace AuctionService.UnitTests.Controllers
         [Fact]
         public async Task CreateAuction_Should_Create_Auction()
         {
-            // Arrange
             var controller = CreateController();
              // fake user
             controller.ControllerContext = FakeAuthenticatedContext();
@@ -105,9 +124,8 @@ namespace AuctionService.UnitTests.Controllers
             var controller = CreateController();
             controller.ControllerContext = FakeAuthenticatedContext();
 
-            controller.ModelState.AddModelError("Make", "Required");
-
             var dto = new CreateAuctionDto();
+            controller.ModelState.AddModelError("Make", "Required");
 
             // Act
             var result = await controller.CreateAuction(dto);
@@ -130,10 +148,11 @@ namespace AuctionService.UnitTests.Controllers
         [Fact]
         public async Task UpdateAuction_Should_Update_Auction()
         {
+            var controller = CreateController(isAdmin: true);
             var auction = new Auction
             {
                 Id = Guid.NewGuid(),
-                Seller = "admin@test.com",
+                Seller = "admin@auction.com",
                 Status = AuctionStatus.Live,
                 Item = new Item
                 {
@@ -146,8 +165,8 @@ namespace AuctionService.UnitTests.Controllers
             _db.Auctions.Add(auction);
             await _db.SaveChangesAsync();
 
-            var controller = CreateController();
-            controller.ControllerContext = FakeAuthenticatedContext();
+
+            controller.ControllerContext = FakeAuthenticatedContext("admin@auction.com", isAdmin: true);
 
             var dto = new UpdateAuctionDto
             {
@@ -181,24 +200,21 @@ namespace AuctionService.UnitTests.Controllers
             result.Should().BeOfType<BadRequestObjectResult>();
         }
 
-        private static ControllerContext FakeAuthenticatedContext()
+        private static ControllerContext FakeAuthenticatedContext(string email = "admin@auction.com",
+        bool isAdmin = true)
         {
-            var user = new ClaimsPrincipal(
-                new ClaimsIdentity(
-                    new[]
-                    {
-                        new Claim(ClaimTypes.Name, "test-user"),
-                        new Claim(ClaimTypes.NameIdentifier, "test-user-id")
-                    },
-                    "TestAuth"
-                )
-            );
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, email),
+                new Claim(ClaimTypes.Email, email),
+                new Claim(ClaimTypes.Role, isAdmin ? "Admin" : "User")
+            };
 
             return new ControllerContext
             {
                 HttpContext = new DefaultHttpContext
                 {
-                    User = user
+                    User = new ClaimsPrincipal(new ClaimsIdentity(claims, "TestAuth"))
                 }
             };
         }
