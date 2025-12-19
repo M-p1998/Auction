@@ -1,0 +1,59 @@
+name: Auction Docker CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  docker-build-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # AuctionService
+      - name: Build & push AuctionService
+        uses: docker/build-push-action@v5
+        with:
+          context: ./AuctionService
+          push: true
+          tags: mp5698/auction-auction-service:latest
+
+      # BidService
+      - name: Build & push BidService
+        uses: docker/build-push-action@v5
+        with:
+          context: ./BidService
+          push: true
+          tags: mp5698/auction-bid-service:latest
+
+      # SearchService
+      - name: Build & push SearchService
+        uses: docker/build-push-action@v5
+        with:
+          context: ./SearchService
+          push: true
+          tags: mp5698/auction-search-service:latest
+
+      # GatewayService
+      - name: Build & push GatewayService
+        uses: docker/build-push-action@v5
+        with:
+          context: ./GatewayService
+          push: true
+          tags: mp5698/auction-gateway-service:latest
+
+      # NotificationService
+      - name: Build & push NotificationService
+        uses: docker/build-push-action@v5
+        with:
+          context: ./NotificationService
+          push: true
+          tags: mp5698/auction-notification:latest
