@@ -33,11 +33,11 @@ services:
       context: .
       dockerfile: AuctionService/Dockerfile
     environment:
-    - ASPNETCORE_ENVIRONMENT=Development
-    - ASPNETCORE_URLS=http://+:7001 
-    - RabbitMq__Host=rabbitmq
-    - RabbitMq__Username=guest
-    - RabbitMq__Password=guest
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:7001 
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Username=guest
+      - RabbitMq__Password=guest
     ports:
       - "7001:7001"
     depends_on:
@@ -54,11 +54,11 @@ services:
       context: .
       dockerfile: SearchService/Dockerfile
     environment:
-    - ASPNETCORE_ENVIRONMENT=Development
-    - ASPNETCORE_URLS=http://+:7002
-    - RabbitMq__Host=rabbitmq
-    - RabbitMq__Username=guest
-    - RabbitMq__Password=guest
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:7002
+      - RabbitMq__Host=rabbitmq
+      - RabbitMq__Username=guest
+      - RabbitMq__Password=guest
    
     ports:
       - "7002:7002"
@@ -109,7 +109,7 @@ services:
     depends_on:
       - rabbitmq
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      - ASPNETCORE_ENVIRONMENT=Development
 
   
 volumes:
