@@ -98,6 +98,10 @@ public class AuctionController: ControllerBase
     [HttpPost]
     public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto dto)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
         var auction = new Auction
         {
             Id = Guid.NewGuid(),
