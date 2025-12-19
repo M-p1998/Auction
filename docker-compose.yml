@@ -28,7 +28,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: mongopw
 
   auction-service:
-    image: auction-auction-service
+    image: mp5698/auction-auction-service:latest
     build:
       context: .
       dockerfile: AuctionService/Dockerfile
@@ -49,7 +49,7 @@ services:
         condition: service_started
 
   search-service:
-    image: auction-search-service
+    image: mp5698/auction-search-service:latest
     build:
       context: .
       dockerfile: SearchService/Dockerfile
@@ -69,7 +69,7 @@ services:
         condition: service_started
 
   gateway-service:
-    image: auction-gateway-service
+    image: mp5698/auction-gateway-service:latest
     build:
       context: .
       dockerfile: GatewayService/Dockerfile
@@ -86,7 +86,7 @@ services:
     build:
       context: .
       dockerfile: BidService/Dockerfile
-    image: auction-bid-service
+    image: mp5698/auction-bid-service:latest
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:7003
@@ -102,7 +102,7 @@ services:
     build:
       context: .
       dockerfile: NotificationService/Dockerfile
-    image: auction-notification
+    image: mp5698/auction-notification:latest
     container_name: notification-service
     ports:
       - "7004:8080"
