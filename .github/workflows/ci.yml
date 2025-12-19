@@ -23,7 +23,7 @@ jobs:
         run: dotnet restore Auction.sln
 
       - name: Build solution
-        run: dotnet build Auction.sln --configuration Release --no-restore
+        run: dotnet build Auction.sln --no-restore
 
       - name: Run tests
         run: dotnet test Auction.sln --no-build --verbosity normal
