@@ -58,6 +58,17 @@ var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]);
 //     });
 // });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddMassTransit(x =>
 {
     // register all consumers from this service (even if none exists)
@@ -98,6 +109,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();  
 app.UseAuthorization();
