@@ -1,47 +1,44 @@
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import AuctionsList from "./pages/AuctionsList";
+import AuctionDetails from "./pages/AuctionDetails";
+import CreateAuction from "./pages/CreateAuction";
+import UpdateAuction from "./pages/UpdateAuction";
+// import BidHistory from "./pages/BidHistory";
+
+import RequireAuth from "./auth/RequireAuth";
+import RequireAdmin from "./RequireAdmin"
+
 import LoginAdmin from "./pages/LoginAdmin";
 import LoginUser from "./pages/LoginUser";
 import RegisterUser from "./pages/RegisterUser";
-import CreateAuction from "./pages/CreateAuction";
-import { RequireAuth } from "./auth/RequireAuth";
-import { useAuth } from "./auth/useAuth";
 
 export default function App() {
-  const { role, logout, token } = useAuth();
-
   return (
-    <div style={{ maxWidth: 1000, margin: "0 auto", padding: 16 }}>
-      <nav style={{ display: "flex", gap: 12, alignItems: "center" }}>
-        <Link to="/">Auctions</Link>
-        <Link to="/login/user">User Login</Link>
-        <Link to="/login/admin">Admin Login</Link>
-        <Link to="/register">Register</Link>
+    <Routes>
+      {/* DEBUG ROUTE */}
+      <Route path="/debug" element={<div style={{ padding: 40 }}>DEBUG ROUTE WORKS</div>} />
 
-        {role === "Admin" && <Link to="/admin/create-auction">Create Auction</Link>}
+      <Route path="/" element={<Navigate to="/auctions" replace />} />
+      <Route path="/auctions" element={<AuctionsList />} />
+      <Route path="/auctions/:id" element={<AuctionDetails />} />
 
-        <div style={{ marginLeft: "auto" }}>
-          {token ? (
-            <button onClick={logout}>Logout ({role})</button>
-          ) : (
-            <span>Not logged in</span>
-          )}
-        </div>
-      </nav>
+      <Route path="/register" element={<RegisterUser />} />
+      <Route path="/login" element={<LoginUser />} />
+      <Route path="/admin/login" element={<LoginAdmin />} />
 
-      <hr />
+      {/* User protected */}
+      <Route element={<RequireAuth />}>
+        {/* <Route path="/me/bids" element={<BidHistory />} /> */}
+      </Route>
 
-      <Routes>
-        <Route path="/" element={<AuctionsList />} />
+      {/* Admin protected */}
+      <Route element={<RequireAdmin />}>
+        <Route path="/admin/auctions/create" element={<CreateAuction />} />
+        <Route path="/admin/auctions/:id/edit" element={<UpdateAuction />} />
+      </Route>
 
-        <Route path="/login/user" element={<LoginUser />} />
-        <Route path="/login/admin" element={<LoginAdmin />} />
-        <Route path="/register" element={<RegisterUser />} />
-
-        <Route element={<RequireAuth role="Admin" />}>
-          <Route path="/admin/create-auction" element={<CreateAuction />} />
-        </Route>
-      </Routes>
-    </div>
+      <Route path="*" element={<div className="p-2">Not found</div>} />
+    </Routes>
   );
 }

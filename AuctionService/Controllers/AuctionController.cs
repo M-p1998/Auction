@@ -49,7 +49,7 @@ public class AuctionController: ControllerBase
     {
         var auctions = await _context.Auctions
             .Include(x => x.Item)
-            .OrderBy(x => x.Item.Make)
+            .OrderByDescending(x => x.CreatedAt)
             .ToListAsync();
         return _mapper.Map<List<AuctionDto>>(auctions);
     }

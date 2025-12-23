@@ -1,35 +1,39 @@
-// src/types/dto.ts
-
 export type AuctionDto = {
   id: string;
-  reservePrice: number;
-  seller: string;
-  winner: string | null;
-  soldAmount: number;
-  currentHighBid: number;
-  createdAt: string;
-  updatedAt: string;
-  auctionEnd: string;
-  status: string;
-
   make: string;
   model: string;
   year: number;
-  color: string;
+  color?: string;
   mileage: number;
   imageUrl: string;
+  reservePrice: number;
+  auctionEnd: string;     // ISO date string
+  createdAt?: string;      
+  currentHighBid?: number; 
 };
 
-export type CreateAuctionDto = {
+export type CreateAuctionRequest = {
   make: string;
   model: string;
   year: number;
-  color: string;
+  color?: string;
   mileage: number;
   imageUrl: string;
   reservePrice: number;
   auctionEnd: string; // ISO string
 };
 
-export type LoginRequest = { email: string; password: string };
-export type LoginResponse = { message: string; token: string };
+export type UpdateAuctionRequest = Partial<CreateAuctionRequest>;
+
+export type CreateBidRequest = {
+  auctionId: string;
+  amount: number;
+};
+
+export type BidDto = {
+  id: string;
+  auctionId: string;
+  amount: number;
+  createdAt: string;
+  auctionTitle?: string; 
+};

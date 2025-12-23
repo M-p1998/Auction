@@ -1,8 +1,8 @@
-// src/api/authClient.ts
-import { createHttpClient } from "./http";
 
-const baseURL = import.meta.env.VITE_GATEWAY_BASE_URL as string;
-const http = createHttpClient(baseURL);
+import { http } from "./http";
+
+// const baseURL = import.meta.env.VITE_GATEWAY_BASE_URL as string;
+// const http = createHttpClient(baseURL);
 
 export type LoginRequest = {
   email: string;

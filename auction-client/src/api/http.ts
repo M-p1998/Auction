@@ -1,19 +1,15 @@
 import axios from "axios";
 
-export function createHttpClient(baseURL: string) {
-  const client = axios.create({
-    baseURL,
-    headers: { "Content-Type": "application/json" },
-  });
+const baseURL = import.meta.env.VITE_API_URL ?? "http://localhost:6001";
 
-  client.interceptors.request.use((config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers = config.headers ?? {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
+export const http = axios.create({
+  baseURL,
+});
 
-  return client;
-}
+http.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
