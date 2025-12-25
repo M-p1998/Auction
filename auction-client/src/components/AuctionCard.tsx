@@ -106,7 +106,33 @@ export default function AuctionCard({ auction }: Props) {
 
       {/* ACTIONS */}
       <div className="auction-actions">
-        <button className="bid-btn">BID</button>
+         {!isAdmin && (
+          <button
+            className="bid-btn small"
+            disabled={isEnded}
+            onClick={() => nav(`/auctions/${auction.id}`)}
+          >
+            {isEnded ? "Ended" : "Bid"}
+          </button>
+        )}
+
+        {isAdmin && (
+          <>
+            <button
+              className="admin-btn update"
+              onClick={() => nav(`/admin/auctions/${auction.id}/edit`)}
+            >
+              Update
+            </button>
+
+            <button
+              className="admin-btn delete"
+              onClick={() => nav(`/api/auctions/${auction.id}`)}
+            >
+              Delete
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

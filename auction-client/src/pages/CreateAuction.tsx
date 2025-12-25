@@ -32,9 +32,49 @@ export default function CreateAuction() {
 
   const [errors, setErrors] = useState<Errors>({});
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function getLocalDateTimeMin() {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    return now.toISOString().slice(0, 16);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  function getApiErrorMessage(err: any): string {
+  const data = err?.response?.data;
+
+  // If backend returned a plain string
+  if (typeof data === "string") return data;
+
+  // ASP.NET ModelState often returns: { errors: { Field: ["msg1","msg2"] } }
+  const errors = data?.errors ?? data;
+
+  if (errors && typeof errors === "object") {
+    const messages: string[] = [];
+
+    for (const key in errors) {
+      const value = errors[key];
+      if (Array.isArray(value)) {
+        for (const msg of value) messages.push(String(msg));
+      } else if (value != null) {
+        messages.push(String(value));
+      }
+    }
+
+    if (messages.length > 0) return messages.join(" | ");
+  }
+
+  // Fallbacks
+  return err?.message ?? "Failed to create auction";
+}
+
 
   function validate(): boolean {
     const e: Errors = {};
+    const now = new Date();
+    const end = new Date(auctionEnd);
+
 
     if (!make) e.make = "Make is required";
     if (!model) e.model = "Model is required";
@@ -46,9 +86,8 @@ export default function CreateAuction() {
     if (!imageUrl.startsWith("http"))
       e.imageUrl = "Enter a valid image URL";
 
-    const endDate = new Date(auctionEnd);
-    if (isNaN(endDate.getTime()) || endDate <= new Date()) {
-      e.auctionEnd = "Auction end date must be in the future";
+    if (isNaN(end.getTime()) || end <= now) {
+      e.auctionEnd = "Auction end must be in the future";
     }
 
     setErrors(e);
@@ -62,6 +101,8 @@ export default function CreateAuction() {
     if (!validate()) return;
 
     try {
+      setIsSubmitting(true);
+
       await createAuction({
         make,
         model,
@@ -73,11 +114,19 @@ export default function CreateAuction() {
         auctionEnd: new Date(auctionEnd).toISOString(),
       });
 
-      nav("/auctions"); 
+      // success -> go back to auctions
+      nav("/auctions", { replace: true });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      setServerError(err?.response?.data ?? "Failed to create auction");
+      // IMPORTANT: convert object errors into a string so React can render it
+      const msg = getApiErrorMessage(err);
+      setServerError(msg);
+    } finally {
+      setIsSubmitting(false);
     }
+
+
+    
   }
 
   return (
@@ -155,16 +204,24 @@ export default function CreateAuction() {
             <label>Auction End</label>
             <input
               type="datetime-local"
-              min={new Date().toISOString().slice(0, 16)}
               value={auctionEnd}
+              min={getLocalDateTimeMin()}
               onChange={e => setAuctionEnd(e.target.value)}
             />
+
           </div>
           {errors.auctionEnd && (
             <small className="field-error">{errors.auctionEnd}</small>
           )}
 
-          <button className="primary-btn">Create Auction</button>
+          {/* <button className="primary-btn">Create Auction</button> */}
+          <button
+            className="primary-btn"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Creating..." : "Create Auction"}
+          </button>
 
           {serverError && <p className="error">{serverError}</p>}
           
