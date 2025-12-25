@@ -50,6 +50,7 @@
 import { useNavigate } from "react-router-dom";
 import Countdown from "./Countdown";
 import type { AuctionDto } from "../types/dto";
+import { useAuth } from "../auth/useAuth";
 
 type Props = {
   auction: AuctionDto;
@@ -57,6 +58,9 @@ type Props = {
 
 export default function AuctionCard({ auction }: Props) {
   const nav = useNavigate();
+  const { isAdmin } = useAuth();
+  const isEnded = new Date(auction.auctionEnd) <= new Date();
+
 
   return (
     <div className="auction-card">
@@ -91,13 +95,18 @@ export default function AuctionCard({ auction }: Props) {
         <div className="auction-lot">
           Mileage: {auction.mileage} miles
         </div>
+        <div className="auction-lot">
+          Color: {auction.color || "N/A"}
+        </div>
+
+        <div className="auction-lot">
+          Reserve Price: ${auction.reservePrice.toLocaleString()}
+        </div>
       </div>
 
       {/* ACTIONS */}
       <div className="auction-actions">
         <button className="bid-btn">BID</button>
-        <button className="follow-btn">FOLLOW</button>
-        <button className="icon-btn">🔔</button>
       </div>
     </div>
   );

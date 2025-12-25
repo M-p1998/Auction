@@ -8,7 +8,8 @@ type Errors = Partial<Record<
   | "year"
   | "mileage"
   | "reservePrice"
-  | "imageUrl",
+  | "imageUrl"
+  | "auctionEnd",
   string
 >>;
 
@@ -45,6 +46,11 @@ export default function CreateAuction() {
     if (!imageUrl.startsWith("http"))
       e.imageUrl = "Enter a valid image URL";
 
+    const endDate = new Date(auctionEnd);
+    if (isNaN(endDate.getTime()) || endDate <= new Date()) {
+      e.auctionEnd = "Auction end date must be in the future";
+    }
+
     setErrors(e);
     return Object.keys(e).length === 0;
   }
@@ -75,92 +81,98 @@ export default function CreateAuction() {
   }
 
   return (
-    <div className="form-container">
-      <h2>Create Car Auction</h2>
+    <div className="page-container">
+      <div className="form-container">
+        <h2>Create Car Auction</h2>
 
-      <form onSubmit={onSubmit} className="auction-form">
-        <div className="form-group">
-            <label>Make</label>
-            <input
-            placeholder="Toyota"
-            value={make}
-            onChange={e => setMake(e.target.value)}
-            />
-            {errors.make && <small className="field-error">{errors.make}</small>}
-        </div>
+        <form onSubmit={onSubmit} className="auction-form">
+          <div className="form-group">
+              <label>Make</label>
+              <input
+              placeholder="Toyota"
+              value={make}
+              onChange={e => setMake(e.target.value)}
+              />
+              {errors.make && <small className="field-error">{errors.make}</small>}
+          </div>
 
-        <div className="form-group">
-            <label>Model</label>
+          <div className="form-group">
+              <label>Model</label>
+              <input
+              placeholder="Camry"
+              value={model}
+              onChange={e => setModel(e.target.value)}
+              />
+              {errors.model && <small className="field-error">{errors.model}</small>}
+          </div>
+          <div className="form-group">
+              <label>Year</label>
+              <input
+              type="number"
+              value={year}
+              onChange={e => setYear(+e.target.value)}
+              />
+              {errors.year && <small className="field-error">{errors.year}</small>}
+          </div>
+          <div className="form-group">
+              <label>Color</label>
+              <input
+              placeholder="Black"
+              value={color}
+              onChange={e => setColor(e.target.value)}
+              />
+          </div>
+          <div className="form-group">
+              <label>Mileage (miles)</label>
+              <input
+              type="number"
+              value={mileage}
+              onChange={e => setMileage(+e.target.value)}
+              />
+              {errors.mileage && <small className="field-error">{errors.mileage}</small>}
+          </div>
+          <div className="form-group">
+              <label>Image URL</label>
+              <input
+              placeholder="https://example.com/car.jpg"
+              value={imageUrl}
+              onChange={e => setImageUrl(e.target.value)}
+              />
+              {errors.imageUrl && <small className="field-error">{errors.imageUrl}</small>}
+          </div>
+          <div className="form-group">
+              <label>Reserve Price ($)</label>
+              <input
+              type="number"
+              value={reservePrice}
+              onChange={e => setReservePrice(+e.target.value)}
+              />
+              {errors.reservePrice && (
+              <small className="field-error">{errors.reservePrice}</small>
+              )}
+          </div>
+          <div className="form-group">
+            <label>Auction End</label>
             <input
-            placeholder="Camry"
-            value={model}
-            onChange={e => setModel(e.target.value)}
+              type="datetime-local"
+              min={new Date().toISOString().slice(0, 16)}
+              value={auctionEnd}
+              onChange={e => setAuctionEnd(e.target.value)}
             />
-            {errors.model && <small className="field-error">{errors.model}</small>}
-        </div>
-        <div className="form-group">
-            <label>Year</label>
-            <input
-            type="number"
-            value={year}
-            onChange={e => setYear(+e.target.value)}
-            />
-            {errors.year && <small className="field-error">{errors.year}</small>}
-        </div>
-         <div className="form-group">
-            <label>Color</label>
-            <input
-            placeholder="Black"
-            value={color}
-            onChange={e => setColor(e.target.value)}
-            />
-        </div>
-        <div className="form-group">
-            <label>Mileage (miles)</label>
-            <input
-            type="number"
-            value={mileage}
-            onChange={e => setMileage(+e.target.value)}
-            />
-            {errors.mileage && <small className="field-error">{errors.mileage}</small>}
-        </div>
-        <div className="form-group">
-            <label>Image URL</label>
-            <input
-            placeholder="https://example.com/car.jpg"
-            value={imageUrl}
-            onChange={e => setImageUrl(e.target.value)}
-            />
-            {errors.imageUrl && <small className="field-error">{errors.imageUrl}</small>}
-        </div>
-        <div className="form-group">
-            <label>Reserve Price ($)</label>
-            <input
-            type="number"
-            value={reservePrice}
-            onChange={e => setReservePrice(+e.target.value)}
-            />
-            {errors.reservePrice && (
-            <small className="field-error">{errors.reservePrice}</small>
-            )}
-        </div>
-         <div className="form-group">
-          <label>Auction End</label>
-          <input
-            type="datetime-local"
-            value={auctionEnd}
-            onChange={e => setAuctionEnd(e.target.value)}
-          />
-        </div>
+          </div>
+          {errors.auctionEnd && (
+            <small className="field-error">{errors.auctionEnd}</small>
+          )}
 
-        <button className="primary-btn">Create Auction</button>
+          <button className="primary-btn">Create Auction</button>
 
-        {serverError && <p className="error">{serverError}</p>}
-        
+          {serverError && <p className="error">{serverError}</p>}
+          
 
-      </form>
-        
+        </form>
+          
 
+      </div>
     </div>
   );
 }

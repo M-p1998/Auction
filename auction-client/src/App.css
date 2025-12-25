@@ -13,6 +13,11 @@
   margin-bottom: 20px;
 }
 
+.auctions-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
 .create-btn {
   padding: 8px 14px;
   border-radius: 6px;
@@ -20,6 +25,12 @@
   color: #fff;
   text-decoration: none;
   font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.create-btn:hover {
+  background: #1e40af;
 }
 
 /* GRID */
@@ -128,7 +139,7 @@
 
 .icon-btn {
   width: 44px;
-  border-radius: 8px;
+  /* border-radius: 8px; */
   background: #111827;
   color: white;
 }
@@ -142,10 +153,121 @@
   background: #fff;
 }
 
+.logo a {
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration: none;
+  color: #111;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 .nav-links a {
-  margin-left: 16px;
+  /* margin-left: 16px; */
   text-decoration: none;
   color: #374151;
   font-weight: 500;
 }
+
+.nav-links a:hover {
+  color: #111;
+}
+
+/* create auction page */
+/* PAGE WRAPPER */
+.page-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+/* FORM CARD */
+.form-container {
+  width: 100%;
+  max-width: 520px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 28px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* FORM */
+.auction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* FIELD */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #374151;
+}
+
+.form-group input {
+  padding: 10px 12px;
+  /* border-radius: 6px;
+  border: 1px solid #d1d5db; */
+  font-size: 15px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+}
+
+/* ERRORS */
+.field-error {
+  color: #dc2626;
+  font-size: 15px;
+  margin-top: 4px;
+}
+
+.error {
+  margin-top: 12px;
+  color: #dc2626;
+  text-align: center;
+}
+
+/* SUBMIT BUTTON */
+.primary-btn {
+  margin-top: 14px;
+  background: #2563eb;
+  color: #fff;
+
+  /* ⬇ smaller button */
+  padding: 10px 14px;
+  border-radius: 6px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  border: none;
+  cursor: pointer;
+}
+
+.primary-btn:hover {
+  background: #1d4ed8;
+}
+
 

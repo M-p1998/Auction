@@ -33,7 +33,7 @@ export default function LoginAdmin() {
     try {
       const res = await loginAdmin({ email, password });
       auth.login(res.token, "Admin");
-      nav("/admin/create-auction");
+      nav("/admin/auctions/create");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (ex: any) {
       setErr(ex?.response?.data ?? "Admin login failed");

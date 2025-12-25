@@ -1,14 +1,33 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/useAuth";
 
 export default function Navbar() {
+  const { isAdmin } = useAuth();
+  const navigate = useNavigate();
+
+  function handleCreateClick() {
+    if (!isAdmin) {
+      alert("Only admin users can create auctions.");
+      return;
+    }
+    navigate("/admin/auctions/create");
+  }
   return (
     <nav className="navbar">
-      <div className="logo">AuctionApp</div>
+      <div className="logo">
+        <Link to="/auctions">AuctionApp</Link>
+      </div>
 
       <div className="nav-links">
-        <Link to="/auctions">Auctions</Link>
+        <Link to="/auth/register-user">Register</Link>
         <Link to="/login">Login</Link>
         <Link to="/admin/login">Admin</Link>
+         <button
+          className="create-btn"
+          onClick={handleCreateClick}
+        >
+          Create Auction
+        </button>
       </div>
     </nav>
   );

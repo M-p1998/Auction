@@ -12,9 +12,12 @@ import RequireAdmin from "./RequireAdmin"
 import LoginAdmin from "./pages/LoginAdmin";
 import LoginUser from "./pages/LoginUser";
 import RegisterUser from "./pages/RegisterUser";
+import Navbar from "./components/Navbar";
 
 export default function App() {
   return (
+    <>
+    <Navbar />
     <Routes>
       {/* DEBUG ROUTE */}
       <Route path="/debug" element={<div style={{ padding: 40 }}>DEBUG ROUTE WORKS</div>} />
@@ -40,5 +43,6 @@ export default function App() {
 
       <Route path="*" element={<div className="p-2">Not found</div>} />
     </Routes>
+    </>
   );
 }

@@ -2,14 +2,11 @@ import { useEffect, useState } from "react";
 import { getAuctions } from "../api/auctionsClient";
 import type { AuctionDto } from "../types/dto";
 import AuctionCard from "../components/AuctionCard";
-// import { useAuth } from "../auth/useAuth";
-// import { useNavigate } from "react-router-dom";
 
 export default function AuctionsList() {
   const [auctions, setAuctions] = useState<AuctionDto[]>([]);
   const [loading, setLoading] = useState(true);
-  // const { isAdmin } = useAuth();
-  // const nav = useNavigate();
+
 
   useEffect(() => {
     (async () => {
@@ -42,10 +39,10 @@ export default function AuctionsList() {
      <div className="auctions-page">
       {/* HEADER */}
       <div className="auctions-header">
-        <h1>Auctions</h1>
-        <a className="create-btn" href="/admin/auctions/create">
-          + Create Auction
-        </a>
+   
+        {/* <a className="create-btn" onClick={handleCreateClick}>
+          Create Auction
+        </a> */}
       </div>
 
       {/* GRID */}
