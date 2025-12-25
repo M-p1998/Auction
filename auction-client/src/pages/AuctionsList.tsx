@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { getAuctions } from "../api/auctionsClient";
 import type { AuctionDto } from "../types/dto";
 import AuctionCard from "../components/AuctionCard";
-import { useAuth } from "../auth/useAuth";
-import { useNavigate } from "react-router-dom";
+// import { useAuth } from "../auth/useAuth";
+// import { useNavigate } from "react-router-dom";
 
 export default function AuctionsList() {
   const [auctions, setAuctions] = useState<AuctionDto[]>([]);
   const [loading, setLoading] = useState(true);
-  const { isAdmin } = useAuth();
-  const nav = useNavigate();
+  // const { isAdmin } = useAuth();
+  // const nav = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -39,22 +39,23 @@ export default function AuctionsList() {
   if (loading) return <div className="p-2">Loading auctions...</div>;
 
   return (
-    <div className="auction-grid">
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-        <h2 style={{ margin: 0 }}>Auctions</h2>
-
-        {isAdmin && (
-          <button onClick={() => nav("/admin/auctions/create")}>
-            + Create Auction
-          </button>
-        )}
+     <div className="auctions-page">
+      {/* HEADER */}
+      <div className="auctions-header">
+        <h1>Auctions</h1>
+        <a className="create-btn" href="/admin/auctions/create">
+          + Create Auction
+        </a>
       </div>
 
-      <div style={{ marginTop: 16 }} className="auction-grid">
+      {/* GRID */}
+      <div className="auction-grid">
         {auctions.map((a) => (
           <AuctionCard key={a.id} auction={a} />
         ))}
       </div>
     </div>
   );
+
+  
 }
