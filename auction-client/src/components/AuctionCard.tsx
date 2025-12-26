@@ -65,7 +65,7 @@ export default function AuctionCard({ auction }: Props) {
   const { isAdmin } = useAuth();
   const isEnded = new Date(auction.auctionEnd) <= new Date();
   const hasBid = (auction.currentHighBid ?? 0) > 0;
-  // const [showBidBox, setShowBidBox] = useState(false);
+  const [showBidBox, setShowBidBox] = useState(false);
   // const [showBid, setShowBid] = useState(false);
 
   const [showBid, setShowBid] = useState(false);

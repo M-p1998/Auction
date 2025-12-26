@@ -366,3 +366,52 @@
   padding-top: 10px;
   border-top: 1px solid #e5e7eb;
 }
+
+
+
+.bid-box {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.bid-box input {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+}
+
+.bid-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.bid-error {
+  color: tomato;
+  font-size: 13px;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
+.btn-secondary {
+  background: #e5e7eb;
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-disabled {
+  background: #9ca3af;
+  color: white;
+}
