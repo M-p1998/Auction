@@ -10,6 +10,8 @@ export type AuctionDto = {
   auctionEnd: string;     // ISO date string
   createdAt?: string;      
   currentHighBid?: number; 
+  status: "Active" | "Ended";
+  winner?: string | null;
 };
 
 export type CreateAuctionRequest = {

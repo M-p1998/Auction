@@ -60,6 +60,8 @@ export default function AuctionCard({ auction }: Props) {
   const nav = useNavigate();
   const { isAdmin } = useAuth();
   const isEnded = new Date(auction.auctionEnd) <= new Date();
+  const hasBid = (auction.currentHighBid ?? 0) > 0;
+
 
 
   return (
@@ -102,13 +104,27 @@ export default function AuctionCard({ auction }: Props) {
         <div className="auction-lot">
           Reserve Price: ${auction.reservePrice.toLocaleString()}
         </div>
+      
+      {/* WINNER / NO BID LOGIC */}
+      {isEnded && (
+        <div className="auction-lot auction-result">
+          {hasBid ? (
+            <>
+              <span className="label">Winner:</span>
+              <span className="value">{auction.winner}</span>
+            </>
+          ) : (
+            <span className="no-bid">No bids placed</span>
+          )}
+        </div>
+      )}
       </div>
 
       {/* ACTIONS */}
       <div className="auction-actions">
          {!isAdmin && (
           <button
-            className="bid-btn small"
+            className="auction-btn bid-btn"
             disabled={isEnded}
             onClick={() => nav(`/auctions/${auction.id}`)}
           >
@@ -119,15 +135,15 @@ export default function AuctionCard({ auction }: Props) {
         {isAdmin && (
           <>
             <button
-              className="admin-btn update"
+              className="auction-btn admin-btn"
               onClick={() => nav(`/admin/auctions/${auction.id}/edit`)}
             >
               Update
             </button>
 
             <button
-              className="admin-btn delete"
-              onClick={() => nav(`/api/auctions/${auction.id}`)}
+              className="auction-btn delete-btn"
+              onClick={() => nav(`/admin/auctions/${auction.id}/delete`)}
             >
               Delete
             </button>
