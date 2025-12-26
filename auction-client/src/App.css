@@ -361,4 +361,8 @@
 .label {
   font-weight: 600;
 }
-
+.inline-bid {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+}
