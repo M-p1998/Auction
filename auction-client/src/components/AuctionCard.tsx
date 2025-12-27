@@ -221,7 +221,7 @@ export default function AuctionCard({ auction, onDelete}: Props) {
             <button
               className="auction-btn delete-btn"
               disabled={!isEnded}
-              // title={!isEnded ? "Can only delete ended auctions" : undefined}
+              title={!isEnded ? "Can only delete ended auctions" : undefined}
               // onClick={() => nav(`/admin/auctions/${auction.id}/delete`)}
               onClick={() => onDelete?.(auction.id)}
             >
