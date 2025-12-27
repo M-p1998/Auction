@@ -64,7 +64,8 @@ type Props = {
 export default function AuctionCard({ auction, onDelete}: Props) {
   const nav = useNavigate();
   const { isAdmin } = useAuth();
-  const isEnded = new Date(auction.auctionEnd) <= new Date();
+  // eslint-disable-next-line react-hooks/purity
+  const isEnded = new Date(auction.auctionEnd).getTime() <= Date.now();
   const hasBid = (auction.currentHighBid ?? 0) > 0;
   const [showBidBox, setShowBidBox] = useState(false);
 
@@ -223,7 +224,13 @@ export default function AuctionCard({ auction, onDelete}: Props) {
               disabled={!isEnded}
               title={!isEnded ? "Can only delete ended auctions" : undefined}
               // onClick={() => nav(`/admin/auctions/${auction.id}/delete`)}
-              onClick={() => onDelete?.(auction.id)}
+              onClick={() => {
+                if (!isEnded) {
+                  alert("Only ended auctions can be deleted.");
+                  return;
+                }
+                onDelete?.(auction.id);
+              }}
             >
               Delete
             </button>

@@ -230,6 +230,12 @@ export default function UpdateAuction() {
     return new Date(year, month - 1, day, hour, minute).getTime();
   }
 
+  function isAuctionEnded(auctionEnd: string) {
+    return new Date(auctionEnd).getTime() <= Date.now();
+  }
+  const auctionEnded = form ? isAuctionEnded(form.auctionEnd) : false;
+
+
   function validate(): Errors {
     if (!form) return {};
 
@@ -237,7 +243,8 @@ export default function UpdateAuction() {
 
     if (!form.make.trim()) e.make = "Make is required";
     if (!form.model.trim()) e.model = "Model is required";
-    if (form.year < 1980) e.year = "Year looks invalid";
+    if (form.year < 1980 || form.year > new Date().getFullYear() + 1) e.year = "Year looks invalid";
+    
     if (!form.color || !form.color.trim()) {
       e.color = "Color is required";
     }
@@ -295,7 +302,14 @@ export default function UpdateAuction() {
       <div className="form-container">
         <h2>Update Auction</h2>
 
+        {auctionEnded && (
+          <div className="warning-box">
+            This auction has ended and can no longer be updated.
+          </div>
+        )}
+
         <form className="auction-form" onSubmit={onSubmit}>
+
           {([
             ["make", "Make"],
             ["model", "Model"],
@@ -346,9 +360,16 @@ export default function UpdateAuction() {
 
           {apiError && <div className="error">{apiError}</div>}
 
-          <button className="primary-btn" disabled={saving}>
+          {/* <button className="primary-btn" disabled={saving}>
             {saving ? "Saving..." : "Save Changes"}
+          </button> */}
+          <button
+            className="primary-btn"
+            disabled={saving || auctionEnded}
+          >
+            {auctionEnded ? "Auction Ended" : saving ? "Saving..." : "Save Changes"}
           </button>
+
         </form>
       </div>
     </div>

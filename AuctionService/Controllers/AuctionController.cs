@@ -180,14 +180,18 @@ public class AuctionController: ControllerBase
         if(auction == null)return NotFound();
 
          // Only the admin can update it
-        if (auction.Seller != User.Identity.Name)
-            return Unauthorized("You cannot update another admin’s auction");
+        // if (auction.Seller != User.Identity.Name)
+        //     return Unauthorized("You cannot update another admin’s auction");
+
+        if (auction.AuctionEnd <= DateTime.UtcNow)
+            return BadRequest("Ended auctions cannot be updated");
         
         auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
         auction.Item.Model = updateAuctionDto.Model ?? auction.Item.Model;
         auction.Item.Color = updateAuctionDto.Color ?? auction.Item.Color;
         auction.Item.Mileage = updateAuctionDto.Mileage ?? auction.Item.Mileage;
         auction.Item.Year = updateAuctionDto.Year ?? auction.Item.Year;
+        auction.Item.ImageUrl = updateAuctionDto.ImageUrl ?? auction.Item.ImageUrl;
         // auction.AuctionEnd  = updateAuctionDto.AuctionEnd ?? auction.AuctionEnd;
         if (updateAuctionDto.AuctionEnd.HasValue)
         {
@@ -208,9 +212,10 @@ public class AuctionController: ControllerBase
             Model = auction.Item.Model,
             Year = auction.Item.Year,
             Color = auction.Item.Color,
-            Mileage = auction.Item.Mileage
-            // AuctionEnd   = auction.AuctionEnd,
-            // ReservePrice = auction.ReservePrice
+            Mileage = auction.Item.Mileage,
+            AuctionEnd   = auction.AuctionEnd,
+            ReservePrice = auction.ReservePrice,
+            ImageUrl = auction.Item.ImageUrl
         };
          var outbox = new OutboxMessage
          {
