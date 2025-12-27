@@ -37,7 +37,8 @@
 .auction-grid {
   display: grid;
   /* grid-template-columns: repeat(4, 1fr); */
-  grid-template-columns: repeat(4, minmax(300px, 1fr));
+  /* grid-template-columns: repeat(4, minmax(300px, 1fr)); */
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 28px;
   max-width: 1400px;
   margin: 0 auto;
@@ -369,23 +370,25 @@
 
 
 
-.bid-box {
-  background: #f9fafb;
-  border-radius: 8px;
-  padding: 12px;
-  margin-top: 10px;
+.bidbox {
+  /* background: #f9fafb; */
+  /* border-radius: 8px; */
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
 }
 
-.bid-box input {
-  width: 100%;
-  padding: 8px;
+.bidbox input {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
   font-size: 14px;
 }
 
-.bid-actions {
+.bidbox-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 10px;
+  /* margin-top: 8px; */
 }
 
 .bid-error {
@@ -409,6 +412,20 @@
 .btn-danger {
   background: #dc2626;
   color: white;
+}
+.primary-btn {
+  flex: 1;
+  background: #2563eb;
+  color: white;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.secondary-btn {
+  flex: 1;
+  background: #e5e7eb;
+  padding: 10px;
+  border-radius: 6px;
 }
 
 .btn-disabled {

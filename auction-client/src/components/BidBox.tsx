@@ -90,7 +90,111 @@
 // }
 
 
-import { useMemo, useState } from "react";
+// import { useMemo, useState } from "react";
+// import { placeBid } from "../api/bidsClient";
+
+// type Props = {
+//   auctionId: string;
+//   reservePrice: number;
+//   currentHighBid?: number;
+//   onCancel: () => void;
+//   onSuccess?: () => void;
+// };
+
+// export default function BidBox({
+//   auctionId,
+//   reservePrice,
+//   currentHighBid,
+//   onCancel,
+//   onSuccess,
+// }: Props) {
+//   const [amountText, setAmountText] = useState<string>("");
+//   const [error, setError] = useState<string>("");
+//   const [saving, setSaving] = useState(false);
+
+//   const minBid = useMemo(() => {
+//     const high = currentHighBid ?? 0;
+//     return Math.max(reservePrice, high + 1);
+//   }, [reservePrice, currentHighBid]);
+
+//   function handleChange(value: string) {
+//     // allow empty
+//     if (value === "") {
+//       setAmountText("");
+//       return;
+//     }
+
+//     // digits only
+//     const digitsOnly = value.replace(/[^\d]/g, "");
+
+//     // prevent leading zeros (but allow "0" while typing)
+//     const normalized = digitsOnly.replace(/^0+(?=\d)/, "");
+
+//     setAmountText(normalized);
+//   }
+
+//   async function submit() {
+//     setError("");
+
+//     if (amountText.trim() === "") {
+//       setError("Enter a bid amount.");
+//       return;
+//     }
+
+//     const amount = Number(amountText);
+
+//     if (!Number.isFinite(amount) || amount <= 0) {
+//       setError("Bid amount must be greater than 0.");
+//       return;
+//     }
+
+//     if (amount < minBid) {
+//       setError(`Bid must be at least $${minBid.toLocaleString()}.`);
+//       return;
+//     }
+
+//     try {
+//       setSaving(true);
+//       await placeBid({ auctionId, amount });
+//       setAmountText("");
+//       onSuccess?.();
+//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//     } catch (e: any) {
+//       setError(e?.response?.data?.message ?? "Failed to place bid.");
+//     } finally {
+//       setSaving(false);
+//     }
+//   }
+
+//   return (
+//     <div className="bidbox">
+//       <div className="bidbox-row">
+//         <input
+//           className="bidbox-input"
+//           inputMode="numeric"
+//           value={amountText}
+//           onChange={(e) => handleChange(e.target.value)}
+//           placeholder={`Min $${minBid.toLocaleString()}`}
+//           disabled={saving}
+//         />
+
+//         <button className="bidbox-btn secondary" onClick={onCancel} disabled={saving}>
+//           Cancel
+//         </button>
+
+//         <button className="bidbox-btn primary" onClick={submit} disabled={saving}>
+//           {saving ? "Placing..." : "Place bid"}
+//         </button>
+//       </div>
+
+//       {error && <div className="bidbox-error">{error}</div>}
+//     </div>
+//   );
+// }
+
+
+
+import { useState } from "react";
 import { placeBid } from "../api/bidsClient";
 
 type Props = {
@@ -108,59 +212,27 @@ export default function BidBox({
   onCancel,
   onSuccess,
 }: Props) {
-  const [amountText, setAmountText] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const minBid = Math.max(reservePrice, (currentHighBid ?? 0) + 1);
+
+  const [amount, setAmount] = useState<number | "">("");
+  const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
-
-  const minBid = useMemo(() => {
-    const high = currentHighBid ?? 0;
-    return Math.max(reservePrice, high + 1);
-  }, [reservePrice, currentHighBid]);
-
-  function handleChange(value: string) {
-    // allow empty
-    if (value === "") {
-      setAmountText("");
-      return;
-    }
-
-    // digits only
-    const digitsOnly = value.replace(/[^\d]/g, "");
-
-    // prevent leading zeros (but allow "0" while typing)
-    const normalized = digitsOnly.replace(/^0+(?=\d)/, "");
-
-    setAmountText(normalized);
-  }
 
   async function submit() {
     setError("");
 
-    if (amountText.trim() === "") {
-      setError("Enter a bid amount.");
-      return;
-    }
-
-    const amount = Number(amountText);
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-      setError("Bid amount must be greater than 0.");
-      return;
-    }
-
-    if (amount < minBid) {
-      setError(`Bid must be at least $${minBid.toLocaleString()}.`);
+    if (amount === "" || amount < minBid) {
+      setError(`Bid must be at least $${minBid.toLocaleString()}`);
       return;
     }
 
     try {
       setSaving(true);
       await placeBid({ auctionId, amount });
-      setAmountText("");
       onSuccess?.();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
-      setError(e?.response?.data?.message ?? "Failed to place bid.");
+      setError(e?.response?.data?.message ?? "Failed to place bid");
     } finally {
       setSaving(false);
     }
@@ -168,26 +240,29 @@ export default function BidBox({
 
   return (
     <div className="bidbox">
-      <div className="bidbox-row">
-        <input
-          className="bidbox-input"
-          inputMode="numeric"
-          value={amountText}
-          onChange={(e) => handleChange(e.target.value)}
-          placeholder={`Min $${minBid.toLocaleString()}`}
-          disabled={saving}
-        />
+      <input
+        type="number"
+        min={minBid}
+        // step={100}
+        value={amount}
+        placeholder={`Min $${minBid.toLocaleString()}`}
+        onChange={(e) =>
+          setAmount(e.target.value === "" ? "" : Number(e.target.value))
+        }
+        className="bidbox-input"
+      />
 
-        <button className="bidbox-btn secondary" onClick={onCancel} disabled={saving}>
+      {error && <div className="bid-error">{error}</div>}
+
+      <div className="bidbox-actions">
+        <button className="bidbox btn-secondary" onClick={onCancel} disabled={saving}>
           Cancel
         </button>
 
-        <button className="bidbox-btn primary" onClick={submit} disabled={saving}>
+        <button className="bidbox btn-primary" onClick={submit} disabled={saving}>
           {saving ? "Placing..." : "Place bid"}
         </button>
       </div>
-
-      {error && <div className="bidbox-error">{error}</div>}
     </div>
   );
 }

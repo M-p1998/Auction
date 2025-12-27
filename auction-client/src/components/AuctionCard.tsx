@@ -58,26 +58,18 @@ import BidBox from "./BidBox";
 type Props = {
   auction: AuctionDto;
   onBidPlaced?: () => void;
+  onDelete?: (id: string) => void;
 };
 
-export default function AuctionCard({ auction }: Props) {
+export default function AuctionCard({ auction, onDelete}: Props) {
   const nav = useNavigate();
   const { isAdmin } = useAuth();
   const isEnded = new Date(auction.auctionEnd) <= new Date();
   const hasBid = (auction.currentHighBid ?? 0) > 0;
   const [showBidBox, setShowBidBox] = useState(false);
+
   // const [showBid, setShowBid] = useState(false);
 
-  const [showBid, setShowBid] = useState(false);
-
-  function toggleBid() {
-    setShowBid((v) => !v);
-  }
-
-
-  function onBidPlaced() {
-    throw new Error("Function not implemented.");
-  }
 
   return (
     <div className="auction-card">
@@ -137,6 +129,7 @@ export default function AuctionCard({ auction }: Props) {
 
       {/* ACTIONS */}
       <div className="auction-actions">
+{/*         
          {!isAdmin && (
           <button
             className="auction-btn bid-btn"
@@ -144,10 +137,29 @@ export default function AuctionCard({ auction }: Props) {
             // onClick={() => nav(`/auctions/${auction.id}`)}
             onClick={toggleBid}
           >
-            {/* {isEnded ? "Ended" : "Bid"} */}
             {isEnded ? "Ended" : showBid ? "Cancel" : "Bid"}
           </button>
-        )}
+        )} */}
+        
+        {/* USER (non-admin) */}
+          {!isAdmin && !isEnded && !showBidBox && (
+            <button
+              className="auction-btn bid-btn"
+              onClick={() => setShowBidBox(true)}
+            >
+              Bid
+            </button>
+          )}
+
+          {!isAdmin && !isEnded && showBidBox && (
+            <BidBox
+              auctionId={auction.id}
+              reservePrice={auction.reservePrice}
+              currentHighBid={auction.currentHighBid}
+              onCancel={() => setShowBidBox(false)}
+              onSuccess={() => setShowBidBox(false)}
+            />
+          )}
 
         {/* <button
           className="auction-btn bid-btn"
@@ -208,7 +220,10 @@ export default function AuctionCard({ auction }: Props) {
 
             <button
               className="auction-btn delete-btn"
-              onClick={() => nav(`/admin/auctions/${auction.id}/delete`)}
+              disabled={!isEnded}
+              // title={!isEnded ? "Can only delete ended auctions" : undefined}
+              // onClick={() => nav(`/admin/auctions/${auction.id}/delete`)}
+              onClick={() => onDelete?.(auction.id)}
             >
               Delete
             </button>
@@ -216,7 +231,7 @@ export default function AuctionCard({ auction }: Props) {
         )}
       </div>
 
-      {!isAdmin && !isEnded && showBid && (
+      {/* {!isAdmin && !isEnded && showBid && (
         <div className="auction-inline-bid">
           <BidBox
             auctionId={auction.id}
@@ -229,7 +244,13 @@ export default function AuctionCard({ auction }: Props) {
             }}
           />
         </div>
+      )} */}
+      {!isAdmin && isEnded && (
+        <button className="auction-btn ended-btn" disabled>
+          Ended
+        </button>
       )}
+
     </div>
   );
 }
