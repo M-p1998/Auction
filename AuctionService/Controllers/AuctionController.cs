@@ -199,6 +199,16 @@ public class AuctionController: ControllerBase
         }
 
         auction.ReservePrice= updateAuctionDto.ReservePrice ?? auction.ReservePrice;
+        // Recalculate valid high bid
+        // var validHighBid = await _context.Bids
+        //     .Where(b => b.AuctionId == auction.Id &&
+        //                 b.Amount >= auction.ReservePrice)
+        //     .OrderByDescending(b => b.Amount)
+        //     .Select(b => (decimal?)b.Amount)
+        //     .FirstOrDefaultAsync();
+
+        // auction.CurrentHighBid = validHighBid ?? 0;
+        // auction.Winner = validHighBid == null ? null : auction.Winner;
         auction.UpdatedAt = DateTime.UtcNow;
 
         var success = await _context.SaveChangesAsync() > 0;
@@ -217,8 +227,16 @@ public class AuctionController: ControllerBase
             ReservePrice = auction.ReservePrice,
             ImageUrl = auction.Item.ImageUrl
         };
-         var outbox = new OutboxMessage
-         {
+        var updateEvent = new AuctionUpdated
+        {
+            Id = auction.Id,
+            ReservePrice = auction.ReservePrice,
+            AuctionEnd = auction.AuctionEnd,
+            ImageUrl = auction.Item.ImageUrl
+        };
+        
+        var outbox = new OutboxMessage
+        {
              Id = Guid.NewGuid(),
              Type = nameof(AuctionUpdated),
              Content = JsonSerializer.Serialize(updatedEvent),

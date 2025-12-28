@@ -20,6 +20,7 @@ builder.Services.AddDbContext<BidDbContext>(opt =>
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<AuctionCreatedConsumer>();
+    x.AddConsumer<AuctionUpdatedConsumer>();
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.Host(builder.Configuration["RabbitMq:Host"], "/", h =>
