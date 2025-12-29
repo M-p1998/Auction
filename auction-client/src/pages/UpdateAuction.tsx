@@ -253,8 +253,8 @@ export default function UpdateAuction() {
     // if (form.mileage < 0) e.mileage = "Mileage cannot be negative";
     if (!form.imageUrl.trim()) e.imageUrl = "Image URL required";
     // if (form.reservePrice <= 0) e.reservePrice = "Invalid price";
-    if (Number.isNaN(form.mileage) || form.mileage <= 0)
-      e.mileage = "Mileage must be greater than 0";
+    if (Number.isNaN(form.mileage) || form.mileage < 0)
+      e.mileage = "Mileage cannot be empty or negative";
 
     if (Number.isNaN(form.reservePrice) || form.reservePrice <= 0)
       e.reservePrice = "Reserve price must be greater than 0";
@@ -328,6 +328,7 @@ export default function UpdateAuction() {
                   setForm({ ...form, [key]: type === "number" ? +e.target.value : e.target.value })
                 }
               /> */}
+
               <input
                 type={type ?? "text"}
                 min={type === "number" ? 1 : undefined}
@@ -344,6 +345,26 @@ export default function UpdateAuction() {
                   })
                 }
               />
+              {/* <input
+                type={type ?? "text"}
+                min={type === "number" && key === "mileage" ? 0 : undefined}
+                minLength={type === "number" && key === "reservePrice" ? 1 : undefined}
+                value={Number.isNaN(form[key]) ? "" : form[key]}
+                onChange={e => {
+                  const value = e.target.value;
+
+                  setForm({
+                    ...form,
+                    [key]:
+                      type === "number"
+                        ? value === ""
+                          ? NaN
+                          : Number(value)
+                        : value,
+                  });
+                }}
+              /> */}
+
               {errors[key] && <div className="field-error">{errors[key]}</div>}
             </div>
           ))}
