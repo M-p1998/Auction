@@ -57,17 +57,22 @@ import BidBox from "./BidBox";
 
 type Props = {
   auction: AuctionDto;
-  onBidPlaced?: () => void;
+  // onBidPlaced?: () => void;
   onDelete?: (id: string) => void;
+  onBidSuccess?: (auctionId: string, newHighBid: number) => void;
 };
 
-export default function AuctionCard({ auction, onDelete}: Props) {
+export default function AuctionCard({ auction, onDelete, onBidSuccess}: Props) {
   const nav = useNavigate();
   const { isAdmin } = useAuth();
   // eslint-disable-next-line react-hooks/purity
   const isEnded = new Date(auction.auctionEnd).getTime() <= Date.now();
   const hasBid = (auction.currentHighBid ?? 0) > 0;
   const [showBidBox, setShowBidBox] = useState(false);
+  const [currentHighBid, setCurrentHighBid] = useState(
+    auction.currentHighBid ?? 0
+  );
+
 
   // const [showBid, setShowBid] = useState(false);
 
@@ -77,9 +82,13 @@ export default function AuctionCard({ auction, onDelete}: Props) {
 
       <div className="auction-bid-header">
         <small>CURRENT BID:</small>
-        <div className="auction-bid-amount">
+        {/* <div className="auction-bid-amount">
           ${auction.currentHighBid?.toLocaleString() ?? "0"}
+        </div> */}
+        <div className="auction-bid-amount">
+          ${currentHighBid.toLocaleString()}
         </div>
+
         <div className="auction-countdown">
           <Countdown end={auction.auctionEnd} />
         </div>
@@ -158,7 +167,12 @@ export default function AuctionCard({ auction, onDelete}: Props) {
               reservePrice={auction.reservePrice}
               currentHighBid={auction.currentHighBid}
               onCancel={() => setShowBidBox(false)}
-              onSuccess={() => setShowBidBox(false)}
+              // onSuccess={() => setShowBidBox(false)}
+              onSuccess={(newBid) => {
+                setCurrentHighBid(newBid); // instant UI update
+                setShowBidBox(false);
+                onBidSuccess?.(auction.id,newBid);
+            }}
             />
           )}
 

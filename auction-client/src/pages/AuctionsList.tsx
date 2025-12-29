@@ -17,6 +17,17 @@ export default function AuctionsList() {
     setAuctions(prev => prev.filter(a => a.id !== id));
   }
 
+  function handleBidSuccess(auctionId: string, newHighBid: number) {
+  setAuctions(prev =>
+    prev.map(a =>
+      a.id === auctionId
+        ? { ...a, currentHighBid: newHighBid }
+        : a
+    )
+  );
+}
+
+
 
   useEffect(() => {
     (async () => {
@@ -63,6 +74,7 @@ export default function AuctionsList() {
               key={a.id}
               auction={a}
               onDelete={handleDelete}
+              onBidSuccess={handleBidSuccess}
             />
         ))}
       </div>

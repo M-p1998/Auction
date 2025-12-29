@@ -30,6 +30,15 @@ export default function AuctionDetails() {
     return new Date(auction.auctionEnd).getTime() <= Date.now();
   }, [auction]);
 
+  function handleBidSuccess(newHighBid: number) {
+    setAuction(prev =>
+      prev
+        ? { ...prev, currentHighBid: newHighBid }
+        : prev
+    );
+  }
+
+
   async function onDelete() {
     if (!auction) return;
     if (!isExpired) {
@@ -105,7 +114,7 @@ export default function AuctionDetails() {
             </div>
           ) 
           : (
-            <BidBox auctionId={auction.id} reservePrice={auction.reservePrice} />
+            <BidBox auctionId={auction.id} reservePrice={auction.reservePrice} onSuccess={handleBidSuccess} />
           )}
         </div>
       </div>

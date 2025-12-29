@@ -201,8 +201,8 @@ type Props = {
   auctionId: string;
   reservePrice: number;
   currentHighBid?: number;
-  onCancel: () => void;
-  onSuccess?: () => void;
+  onCancel?: () => void;
+  onSuccess: (newHighBid: number) => void;
 };
 
 export default function BidBox({
@@ -229,7 +229,8 @@ export default function BidBox({
     try {
       setSaving(true);
       await placeBid({ auctionId, amount });
-      onSuccess?.();
+      // onSuccess?.();
+      onSuccess(amount);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       setError(e?.response?.data?.message ?? "Failed to place bid");

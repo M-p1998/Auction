@@ -20,9 +20,10 @@ export default function CreateAuction() {
   const [model, setModel] = useState("");
   const [year, setYear] = useState<number>(2024);
   const [color, setColor] = useState("");
-  const [mileage, setMileage] = useState<number>(0);
+  // const [mileage, setMileage] = useState<number>(0);
+  const [mileage, setMileage] = useState<number | "">("");
   const [imageUrl, setImageUrl] = useState("");
-  const [reservePrice, setReservePrice] = useState<number>(0);
+  const [reservePrice, setReservePrice] = useState<number | "">("");
   const [auctionEnd, setAuctionEnd] = useState(() => {
     const d = new Date();
     d.setDate(d.getDate() + 7); // default = 7 days from now
@@ -80,9 +81,13 @@ export default function CreateAuction() {
     if (!model) e.model = "Model is required";
     if (year < 1980 || year > new Date().getFullYear() + 1)
       e.year = "Enter a valid car year";
-    if (mileage < 0) e.mileage = "Mileage cannot be negative";
-    if (reservePrice <= 0)
-      e.reservePrice = "Reserve price must be greater than 0";
+    // if (mileage < 0) e.mileage = "Mileage cannot be negative";
+    if (mileage === "" || mileage < 0) {
+        e.mileage = "Mileage cannot be empty or negative";
+      }
+    if (reservePrice === "" || reservePrice <= 0) {
+        e.reservePrice = "Reserve price must be greater than 0";
+      }
     if (!imageUrl.startsWith("http"))
       e.imageUrl = "Enter a valid image URL";
 
@@ -108,9 +113,9 @@ export default function CreateAuction() {
         model,
         year,
         color,
-        mileage,
+        mileage: Number(mileage),
         imageUrl,
-        reservePrice,
+        reservePrice: Number(reservePrice),
         auctionEnd: new Date(auctionEnd).toISOString(),
       });
 
@@ -176,7 +181,10 @@ export default function CreateAuction() {
               <input
               type="number"
               value={mileage}
-              onChange={e => setMileage(+e.target.value)}
+              onChange={e =>
+                // e => setMileage(+e.target.value)
+                setMileage(e.target.value === "" ? "" : Number(e.target.value))
+              }
               />
               {errors.mileage && <small className="field-error">{errors.mileage}</small>}
           </div>
@@ -194,7 +202,9 @@ export default function CreateAuction() {
               <input
               type="number"
               value={reservePrice}
-              onChange={e => setReservePrice(+e.target.value)}
+              onChange={e => 
+                setReservePrice(e.target.value === "" ? "" : Number(e.target.value))
+              }
               />
               {errors.reservePrice && (
               <small className="field-error">{errors.reservePrice}</small>
