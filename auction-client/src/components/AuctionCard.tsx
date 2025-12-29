@@ -170,8 +170,9 @@ export default function AuctionCard({ auction, onDelete, onBidSuccess}: Props) {
               // onSuccess={() => setShowBidBox(false)}
               onSuccess={(newBid) => {
                 setCurrentHighBid(newBid); // instant UI update
-                setShowBidBox(false);
                 onBidSuccess?.(auction.id,newBid);
+                setShowBidBox(false);
+                
             }}
             />
           )}

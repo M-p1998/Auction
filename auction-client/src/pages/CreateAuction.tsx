@@ -92,7 +92,7 @@ export default function CreateAuction() {
       e.imageUrl = "Enter a valid image URL";
 
     if (isNaN(end.getTime()) || end <= now) {
-      e.auctionEnd = "Auction end must be in the future";
+      e.auctionEnd = "End date must be in the future";
     }
 
     setErrors(e);

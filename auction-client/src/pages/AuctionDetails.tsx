@@ -30,13 +30,19 @@ export default function AuctionDetails() {
     return new Date(auction.auctionEnd).getTime() <= Date.now();
   }, [auction]);
 
-  function handleBidSuccess(newHighBid: number) {
-    setAuction(prev =>
-      prev
-        ? { ...prev, currentHighBid: newHighBid }
-        : prev
-    );
+  // function handleBidSuccess(newHighBid: number) {
+  //   setAuction(prev =>
+  //     prev
+  //       ? { ...prev, currentHighBid: newHighBid }
+  //       : prev
+  //   );
+  // }
+  async function handleBidSuccess() {
+    if (!id) return;
+    const fresh = await getAuctionById(id);
+    setAuction(fresh);
   }
+
 
 
   async function onDelete() {
@@ -114,7 +120,7 @@ export default function AuctionDetails() {
             </div>
           ) 
           : (
-            <BidBox auctionId={auction.id} reservePrice={auction.reservePrice} onSuccess={handleBidSuccess} />
+            <BidBox auctionId={auction.id} reservePrice={auction.reservePrice} currentHighBid={auction.currentHighBid} onSuccess={handleBidSuccess} />
           )}
         </div>
       </div>

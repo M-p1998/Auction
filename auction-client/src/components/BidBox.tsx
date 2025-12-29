@@ -212,7 +212,10 @@ export default function BidBox({
   onCancel,
   onSuccess,
 }: Props) {
-  const minBid = Math.max(reservePrice, (currentHighBid ?? 0) + 1);
+  // const minBid = Math.max(reservePrice, (currentHighBid ?? 0) + 1);
+  const minBid = (currentHighBid && currentHighBid > 0)
+    ? currentHighBid + 1
+    : reservePrice;
 
   const [amount, setAmount] = useState<number | "">("");
   const [error, setError] = useState("");
@@ -221,10 +224,20 @@ export default function BidBox({
   async function submit() {
     setError("");
 
+    // if (amount === "" || amount < minBid) {
+    //   setError(`Bid must be at least $${minBid.toLocaleString()}`);
+    //   return;
+    // }
+
     if (amount === "" || amount < minBid) {
-      setError(`Bid must be at least $${minBid.toLocaleString()}`);
+      if (currentHighBid && currentHighBid > 0) {
+        setError(`Bid must be higher than current bid ($${currentHighBid.toLocaleString()})`);
+      } else {
+        setError(`Bid must be at least reserve price ($${reservePrice.toLocaleString()})`);
+      }
       return;
     }
+
 
     try {
       setSaving(true);

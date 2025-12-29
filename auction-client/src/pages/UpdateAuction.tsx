@@ -193,6 +193,12 @@ import type { CreateAuctionRequest } from "../types/dto";
 
 type Errors = Partial<Record<keyof CreateAuctionRequest, string>>;
 
+function toUtcISOString(localDateTime: string) {
+  const local = new Date(localDateTime);
+  return local.toISOString();
+}
+
+
 export default function UpdateAuction() {
   const { id } = useParams();
   const nav = useNavigate();
@@ -222,18 +228,25 @@ export default function UpdateAuction() {
   }, [id]);
 
 
-  function parseLocalDateTime(value: string) {
-    const [date, time] = value.split("T");
-    const [year, month, day] = date.split("-").map(Number);
-    const [hour, minute] = time.split(":").map(Number);
+  // function parseLocalDateTime(value: string) {
+  //   const [date, time] = value.split("T");
+  //   const [year, month, day] = date.split("-").map(Number);
+  //   const [hour, minute] = time.split(":").map(Number);
 
-    return new Date(year, month - 1, day, hour, minute).getTime();
-  }
+  //   return new Date(year, month - 1, day, hour, minute).getTime();
+  // }
 
   function isAuctionEnded(auctionEnd: string) {
     return new Date(auctionEnd).getTime() <= Date.now();
   }
   const auctionEnded = form ? isAuctionEnded(form.auctionEnd) : false;
+
+  function toLocalInputValue(iso: string) {
+  const d = new Date(iso);
+  const offset = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - offset).toISOString().slice(0, 16);
+}
+
 
 
   function validate(): Errors {
@@ -259,18 +272,18 @@ export default function UpdateAuction() {
     if (Number.isNaN(form.reservePrice) || form.reservePrice <= 0)
       e.reservePrice = "Reserve price must be greater than 0";
 
-    // const end = new Date(form.auctionEnd).getTime();
-    // if (isNaN(end) || end <= Date.now()) {
-    //   e.auctionEnd = "End date must be in the future";
-    // }
+    const end = new Date(form.auctionEnd).getTime();
+    if (isNaN(end) || end <= Date.now()) {
+      e.auctionEnd = "End date must be in the future";
+    }
     // const end = new Date(form.auctionEnd).getTime();
     // if (Number.isNaN(end)) e.auctionEnd = "Invalid date";
     // else if (end <= Date.now()) e.auctionEnd = "End date must be in the future";
 
-    const end = parseLocalDateTime(form.auctionEnd);
-    if (end <= Date.now()) {
-      e.auctionEnd = "End date must be in the future";
-    }
+    // const end = parseLocalDateTime(form.auctionEnd);
+    // if (end <= Date.now()) {
+    //   e.auctionEnd = "End date must be in the future";
+    // }
 
     return e;
   }
@@ -371,11 +384,22 @@ export default function UpdateAuction() {
 
           <div className="form-group">
             <label>Auction End</label>
-            <input
+            {/* <input
               type="datetime-local"
               value={form.auctionEnd.slice(0, 16)}
-              onChange={e => setForm({ ...form, auctionEnd: e.target.value })}
+              onChange={e => setForm({ ...form, auctionEnd: toUtcISOString(e.target.value) })}
+            /> */}
+            <input
+              type="datetime-local"
+              value={toLocalInputValue(form.auctionEnd)}
+              onChange={e =>
+                setForm({
+                  ...form,
+                  auctionEnd: toUtcISOString(e.target.value),
+                })
+              }
             />
+
             {errors.auctionEnd && <div className="field-error">{errors.auctionEnd}</div>}
           </div>
 
