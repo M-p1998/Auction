@@ -112,7 +112,7 @@ export default function AuctionCard({ auction, onDelete, onBidSuccess}: Props) {
           {auction.year} {auction.make} {auction.model}
         </div>
         <div className="auction-lot">
-          Mileage: {auction.mileage} miles
+          Mileage: {auction.mileage.toLocaleString()} miles
         </div>
         <div className="auction-lot">
           Color: {auction.color || "N/A"}
