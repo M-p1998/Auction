@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import type { AuctionDto } from "../types/dto";
 import { deleteAuction, getAuctionById } from "../api/auctionsClient";
 import { useAuth } from "../auth/useAuth";
@@ -12,6 +12,7 @@ export default function AuctionDetails() {
   const [loading, setLoading] = useState(true);
   const nav = useNavigate();
   const { isAdmin } = useAuth();
+  const { isLoggedIn } = useAuth();
 
   useEffect(() => {
     (async () => {
@@ -110,7 +111,7 @@ export default function AuctionDetails() {
         <div className="auction-card-body">
           <h3 style={{ marginTop: 0 }}>Bid</h3>
 
-          {isAdmin ? (
+          {/* {isAdmin ? (
             <div style={{ opacity: 0.85 }}>
               Admin accounts cannot bid.
             </div>
@@ -119,9 +120,26 @@ export default function AuctionDetails() {
               This auction has expired. Bidding is closed.
             </div>
           ) 
-          : (
+          : 
+          (
             <BidBox auctionId={auction.id} reservePrice={auction.reservePrice} currentHighBid={auction.currentHighBid} onSuccess={handleBidSuccess} />
+          ) 
+          } */}
+
+          {isLoggedIn ? (
+            <BidBox
+              auctionId={auction.id}
+              reservePrice={auction.reservePrice}
+              currentHighBid={auction.currentHighBid}
+              onSuccess={handleBidSuccess}
+            />
+          ) : (
+            <div style={{ opacity: 0.85 }}>
+              Please <Link to="/login">login</Link> to place a bid.
+            </div>
           )}
+
+
         </div>
       </div>
     </div>

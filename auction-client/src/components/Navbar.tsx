@@ -5,13 +5,22 @@ export default function Navbar() {
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
+  // function handleCreateClick() {
+  //   if (!isAdmin) {
+  //     alert("Only admin can create auctions.");
+  //     return;
+  //   }
+  //   navigate("/admin/auctions/create");
+  // }
   function handleCreateClick() {
-    if (!isAdmin) {
-      alert("Only admin users can create auctions.");
-      return;
-    }
-    navigate("/admin/auctions/create");
+  if (!isAdmin) {
+    alert("Please log in as an admin to create auctions.");
+    navigate("/admin/login");
+    return;
   }
+
+  navigate("/admin/auctions/create");
+}
   return (
     <nav className="navbar">
       <div className="logo">
@@ -22,12 +31,22 @@ export default function Navbar() {
         <Link to="/register">Register</Link>
         <Link to="/login">Login</Link>
         <Link to="/admin/login">Admin</Link>
-         <button
+        <button
           className="create-btn"
           onClick={handleCreateClick}
         >
           Create Auction
         </button>
+        {/* <button
+          className="create-btn"
+          disabled={!isAdmin}
+          title={!isAdmin ? "Admin login required" : ""}
+          onClick={handleCreateClick}
+        >
+          Create Auction
+        </button> */}
+
+
       </div>
     </nav>
   );

@@ -196,6 +196,8 @@
 
 import { useState } from "react";
 import { placeBid } from "../api/bidsClient";
+import { useAuth } from "../auth/useAuth";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   auctionId: string;
@@ -221,6 +223,9 @@ export default function BidBox({
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+
   async function submit() {
     setError("");
 
@@ -228,6 +233,10 @@ export default function BidBox({
     //   setError(`Bid must be at least $${minBid.toLocaleString()}`);
     //   return;
     // }
+    if (!isLoggedIn) {
+    setError("You must be logged in to place a bid.");
+    return;
+  }
 
     if (amount === "" || amount < minBid) {
       if (currentHighBid && currentHighBid > 0) {
@@ -266,7 +275,24 @@ export default function BidBox({
         className="bidbox-input"
       />
 
-      {error && <div className="bid-error">{error}</div>}
+      {/* {error && <div className="bid-error">{error}</div>} */}
+
+      {error && (
+        <div className="bid-error">
+          {error}
+          {!isLoggedIn && (
+            <div style={{ marginTop: 6 }}>
+              <button
+                className="link-btn"
+                onClick={() => navigate("/login")}
+              >
+                Login now
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
 
       <div className="bidbox-actions">
         <button className="bidbox btn-secondary" onClick={onCancel} disabled={saving}>
