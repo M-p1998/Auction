@@ -1,4 +1,4 @@
-import React, { createContext, useMemo, useState } from "react";
+import React, { createContext, useMemo, useState, useEffect, useRef } from "react";
 
 export type Role = "Admin" | "User" | null;
 
@@ -19,6 +19,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<Role>(
     () => (localStorage.getItem("role") as Role) ?? null
   );
+
+   const IDLE_TIMEOUT = 10 * 60 * 1000; // 15 minutes
+  const idleTimer = useRef<number | null>(null);
+
+  function resetIdleTimer() {
+    if (idleTimer.current) {
+      window.clearTimeout(idleTimer.current);
+    }
+
+    idleTimer.current = window.setTimeout(() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("role");
+      setToken(null);
+      setRole(null);
+      window.location.href = "/login";
+    }, IDLE_TIMEOUT);
+  }
+
+  useEffect(() => {
+    if (!token) return;
+
+    const events = [
+      "mousemove",
+      "mousedown",
+      "keydown",
+      "scroll",
+      "touchstart"
+    ];
+
+    events.forEach(event =>
+      window.addEventListener(event, resetIdleTimer)
+    );
+
+    resetIdleTimer();
+
+    return () => {
+      if (idleTimer.current) {
+        window.clearTimeout(idleTimer.current);
+      }
+
+      events.forEach(event =>
+        window.removeEventListener(event, resetIdleTimer)
+      );
+    };
+  }, [token]);
 
   const value = useMemo<AuthState>(() => ({
     token,
