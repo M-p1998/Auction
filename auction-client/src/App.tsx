@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import AuctionsList from "./pages/AuctionsList";
-import AuctionDetails from "./pages/AuctionDetails";
+// import AuctionDetails from "./pages/AuctionDetails";
 import CreateAuction from "./pages/CreateAuction";
 import UpdateAuction from "./pages/UpdateAuction";
 // import BidHistory from "./pages/BidHistory";
@@ -24,7 +24,7 @@ export default function App() {
 
       <Route path="/" element={<Navigate to="/auctions" replace />} />
       <Route path="/auctions" element={<AuctionsList />} />
-      <Route path="/auctions/:id" element={<AuctionDetails />} />
+      {/* <Route path="/auctions/:id" element={<AuctionDetails />} /> */}
 
       <Route path="/register" element={<RegisterUser />} />
       <Route path="/login" element={<LoginUser />} />

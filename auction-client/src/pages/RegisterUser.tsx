@@ -41,11 +41,13 @@ export default function RegisterUser() {
     <div style={{ maxWidth: 420, margin: "40px auto" }}>
       <h2>Register User</h2>
       <form onSubmit={onSubmit}>
-        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email" style={{ width: "100%", padding: 10 }} />
+        <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="email" style={{ width: "80%", padding: 10 }} />
         <div style={{ height: 10 }} />
-        <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="password" type="password" style={{ width: "100%", padding: 10 }} />
+        <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder="password" type="password" style={{ width: "80%", padding: 10 }} />
         <div style={{ height: 10 }} />
-        <button style={{ width: "100%", padding: 10 }}>Register</button>
+        <button className="primary-btn" type="submit">
+          Register
+        </button>
       </form>
 
       {msg && <p>{msg}</p>}

@@ -48,7 +48,7 @@ export default function LoginUser() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="email"
-          style={{ width: "100%", padding: 10 }}
+          style={{ width: "80%", padding: 10 }}
         />
 
         <div style={{ height: 10 }} />
@@ -58,12 +58,15 @@ export default function LoginUser() {
           onChange={(e) => setPassword(e.target.value)}
           placeholder="password"
           type="password"
-          style={{ width: "100%", padding: 10 }}
+          style={{ width: "80%", padding: 10 }}
         />
 
         <div style={{ height: 10 }} />
 
-        <button style={{ width: "100%", padding: 10 }}>
+        {/* <button style={{ width: "100%", padding: 10 }}>
+          Login
+        </button> */}
+        <button className="primary-btn" type="submit">
           Login
         </button>
       </form>

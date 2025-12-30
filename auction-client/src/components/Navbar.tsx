@@ -19,7 +19,7 @@ export default function Navbar() {
       </div>
 
       <div className="nav-links">
-        <Link to="/auth/register-user">Register</Link>
+        <Link to="/register">Register</Link>
         <Link to="/login">Login</Link>
         <Link to="/admin/login">Admin</Link>
          <button
