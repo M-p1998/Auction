@@ -393,7 +393,8 @@
 
 .bid-error {
   color: tomato;
-  font-size: 13px;
+  font-size: 18px;
+  
 }
 
 .btn-primary {
@@ -459,5 +460,17 @@
 button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 1px solid #ccc;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #f3f4f6;
 }
 

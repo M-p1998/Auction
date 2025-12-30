@@ -10,7 +10,7 @@ export default function RegisterUser() {
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
-  const nav = useNavigate();
+  const navigate = useNavigate();
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -30,7 +30,8 @@ export default function RegisterUser() {
     try {
       const res = await registerUser({ email, password });
       setMsg(String(res));
-      nav("/login/user");
+      alert("Registration successful! Please log in.");
+      navigate("/login");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (ex: any) {
       setErr(ex?.response?.data ?? "Register failed");

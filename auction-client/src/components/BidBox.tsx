@@ -234,7 +234,7 @@ export default function BidBox({
     //   return;
     // }
     if (!isLoggedIn) {
-    setError("You must be logged in to place a bid.");
+    setError("Please log in to place a bid.");
     return;
   }
 

@@ -2,8 +2,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 
 export default function Navbar() {
-  const { isAdmin } = useAuth();
+  const { isLoggedIn, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
+
 
   // function handleCreateClick() {
   //   if (!isAdmin) {
@@ -21,6 +22,12 @@ export default function Navbar() {
 
   navigate("/admin/auctions/create");
 }
+
+  function handleLogout() {
+    logout();
+    navigate("/auctions");
+  }
+
   return (
     <nav className="navbar">
       <div className="logo">
@@ -28,9 +35,24 @@ export default function Navbar() {
       </div>
 
       <div className="nav-links">
-        <Link to="/register">Register</Link>
-        <Link to="/login">Login</Link>
-        <Link to="/admin/login">Admin</Link>
+        {!isLoggedIn && (
+          <>
+            <Link to="/register">Register</Link>
+            <Link to="/login">Login</Link>
+            <Link to="/admin/login">Admin</Link>
+          </>
+        )}
+        {isLoggedIn && (
+          <>
+            <span style={{ fontWeight: 500 }}>
+              {isAdmin ? "Admin" : "User"}
+            </span>
+
+            <button className="logout-btn" onClick={handleLogout}>
+              Logout
+            </button>
+          </>
+        )}
         <button
           className="create-btn"
           onClick={handleCreateClick}

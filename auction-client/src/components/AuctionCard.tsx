@@ -97,7 +97,7 @@ export default function AuctionCard({ auction, onDelete, onBidSuccess}: Props) {
       {/* IMAGE */}
       <div
         className="auction-image-wrapper"
-        onClick={() => nav(`/auctions/${auction.id}`)}
+        // onClick={() => nav(`/auctions/${auction.id}`)}
       >
         <img
           className="auction-image"
