@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/useAuth";
 
 export default function Navbar() {
-  const { isLoggedIn, isAdmin, logout } = useAuth();
+  const { isLoggedIn, isAdmin, logout, email } = useAuth();
   const navigate = useNavigate();
 
 
@@ -45,7 +45,7 @@ export default function Navbar() {
         {isLoggedIn && (
           <>
             <span style={{ fontWeight: 500 }}>
-              {isAdmin ? "Admin" : "User"}
+              {isAdmin ? "Admin" : email}
             </span>
 
             <button className="logout-btn" onClick={handleLogout}>

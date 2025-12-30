@@ -5,7 +5,8 @@ export type Role = "Admin" | "User" | null;
 export type AuthState = {
   token: string | null;
   role: Role;
-  login: (token: string, role: Exclude<Role, null>) => void;
+  email: string | null;
+  login: (token: string, role: Exclude<Role, null>, email: string) => void;
   logout: () => void;
 };
 
@@ -20,8 +21,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => (localStorage.getItem("role") as Role) ?? null
   );
 
-   const IDLE_TIMEOUT = 10 * 60 * 1000; // 15 minutes
+  const IDLE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
   const idleTimer = useRef<number | null>(null);
+
+  const [email, setEmail] = useState<string | null>(
+  () => localStorage.getItem("email")
+);
+
 
   function resetIdleTimer() {
     if (idleTimer.current) {
@@ -68,19 +74,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<AuthState>(() => ({
     token,
     role,
-    login: (t, r) => {
+    email,
+    login: (t, r, e) => {
       localStorage.setItem("token", t);
       localStorage.setItem("role", r);
+      localStorage.setItem("email",e);
       setToken(t);
       setRole(r);
+      setEmail(e);
     },
     logout: () => {
       localStorage.removeItem("token");
       localStorage.removeItem("role");
+      localStorage.removeItem("email")
       setToken(null);
       setRole(null);
+      setEmail(null);
     },
-  }), [token, role]);
+  }), [token, role, email]);
 
   return (
     <AuthContext.Provider value={value}>

@@ -31,7 +31,7 @@ export default function LoginUser() {
 
     try {
       const res = await loginUser({ email, password });
-      auth.login(res.token, "User");
+      auth.login(res.token, "User",email);
       nav("/");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (ex: any) {

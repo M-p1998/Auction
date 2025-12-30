@@ -32,7 +32,7 @@ export default function LoginAdmin() {
 
     try {
       const res = await loginAdmin({ email, password });
-      auth.login(res.token, "Admin");
+      auth.login(res.token, "Admin", email);
       nav("/auctions");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (ex: any) {
