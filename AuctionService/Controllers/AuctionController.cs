@@ -197,8 +197,49 @@ public class AuctionController: ControllerBase
         {
             auction.AuctionEnd = updateAuctionDto.AuctionEnd.Value.ToUniversalTime();
         }
+        if (updateAuctionDto.ReservePrice.HasValue)
+        {
+            auction.ReservePrice = updateAuctionDto.ReservePrice.Value;
+        }
+        
 
-        auction.ReservePrice= updateAuctionDto.ReservePrice ?? auction.ReservePrice;
+        // auction.ReservePrice= updateAuctionDto.ReservePrice ?? auction.ReservePrice;
+        // 🔴 ONLY update reserve price if provided
+    // if (updateAuctionDto.ReservePrice.HasValue)
+    // {
+    //     auction.ReservePrice = updateAuctionDto.ReservePrice.Value;
+
+    //     // Recalculate high bid ONLY if needed
+    //     var validHighBid = await _context.Bids
+    //         .Where(b => b.AuctionId == auction.Id &&
+    //                     b.Amount >= auction.ReservePrice)
+    //         .OrderByDescending(b => b.Amount)
+    //         .FirstOrDefaultAsync();
+
+    //     auction.CurrentHighBid = validHighBid?.Amount ?? 0;
+    //     auction.WinningBidder = validHighBid?.Bidder;
+    // }
+
+         // 🚨 IMPORTANT: track if reserve price changed
+            // 🔴 ONLY handle reserve price IF provided
+        // ✅ ONLY update reserve price if user sent it
+    // if (updateAuctionDto.ReservePrice.HasValue)
+    // {
+    //     auction.ReservePrice = updateAuctionDto.ReservePrice.Value;
+
+    //     // ✅ only wipe if currentHighBid is now invalid
+    //     if (auction.CurrentHighBid < auction.ReservePrice)
+    //     {
+    //         auction.CurrentHighBid = 0;
+    //         auction.WinningBidder = null;
+    //     }
+    // }
+        // SAFETY CHECK: preserve valid high bid
+        // if (auction.CurrentHighBid < auction.ReservePrice)
+        // {
+        //     auction.CurrentHighBid = 0;
+        //     auction.WinningBidder = null;
+        // }
         // Recalculate valid high bid
         // var validHighBid = await _context.Bids
         //     .Where(b => b.AuctionId == auction.Id &&
@@ -209,11 +250,61 @@ public class AuctionController: ControllerBase
 
         // auction.CurrentHighBid = validHighBid ?? 0;
         // auction.Winner = validHighBid == null ? null : auction.Winner;
-        auction.UpdatedAt = DateTime.UtcNow;
+        // var validHighBid = await _context.Bids
+        //     .Where(b => b.AuctionId == auction.Id &&
+        //                 b.Amount >= auction.ReservePrice)
+        //     .OrderByDescending(b => b.Amount)
+        //     .Select(b => (decimal?)b.Amount)
+        //     .FirstOrDefaultAsync();
 
-        var success = await _context.SaveChangesAsync() > 0;
-        // await _searchSync.SyncWithSearchService(auction);
-        if(!success) return BadRequest("Could not save changes");
+        // auction.CurrentHighBid = validHighBid ?? 0;
+
+        // auction.WinningBidder = validHighBid == null
+        //     ? null
+        //     : auction.WinningBidder;
+
+    //     var validHighBid = await _context.Bids
+    //     .Where(b =>
+    //         b.AuctionId == auction.Id &&
+    //         b.Amount >= auction.ReservePrice)
+    //     .OrderByDescending(b => b.Amount)
+    //     .Select(b => new
+    //     {
+    //         b.Amount,
+    //         b.Bidder
+    //     })
+    //     .FirstOrDefaultAsync();
+
+    // auction.CurrentHighBid = validHighBid?.Amount ?? 0;
+    // auction.WinningBidder = validHighBid?.Bidder;
+
+    // var validHighBid = await _context.Bids
+    //     .Where(b =>
+    //         b.AuctionId == auction.Id &&
+    //         b.Amount >= auction.ReservePrice)
+    //     .OrderByDescending(b => b.Amount)
+    //     .Select(b => (decimal?)b.Amount)
+    //     .FirstOrDefaultAsync();
+
+    // if (validHighBid.HasValue)
+    // {
+    //     auction.CurrentHighBid = validHighBid.Value;
+    // }
+    // else
+    // {
+    //     auction.CurrentHighBid = 0;
+    //     auction.WinningBidder = null;
+    // }
+
+        auction.UpdatedAt = DateTime.UtcNow;
+        await _context.SaveChangesAsync();
+        // var success = await _context.SaveChangesAsync() > 0;
+        // if (!success) return BadRequest("Could not save changes");
+
+
+        // var success = await _context.SaveChangesAsync() > 0;
+        // // await _searchSync.SyncWithSearchService(auction);
+        // if(!success) return BadRequest("Could not save changes");
         // Publish AuctionUpdated event
         var updatedEvent = new AuctionUpdated
         {
@@ -225,15 +316,16 @@ public class AuctionController: ControllerBase
             Mileage = auction.Item.Mileage,
             AuctionEnd   = auction.AuctionEnd,
             ReservePrice = auction.ReservePrice,
+            CurrentHighBid = auction.CurrentHighBid,
             ImageUrl = auction.Item.ImageUrl
         };
-        var updateEvent = new AuctionUpdated
-        {
-            Id = auction.Id,
-            ReservePrice = auction.ReservePrice,
-            AuctionEnd = auction.AuctionEnd,
-            ImageUrl = auction.Item.ImageUrl
-        };
+        // var updateEvent = new AuctionUpdated
+        // {
+        //     Id = auction.Id,
+        //     ReservePrice = auction.ReservePrice,
+        //     AuctionEnd = auction.AuctionEnd,
+        //     ImageUrl = auction.Item.ImageUrl
+        // };
         
         var outbox = new OutboxMessage
         {
@@ -242,12 +334,78 @@ public class AuctionController: ControllerBase
              Content = JsonSerializer.Serialize(updatedEvent),
          };
         _context.OutboxMessages.Add(outbox);
+        // var success = await _context.SaveChangesAsync() > 0;
+        // if (!success)
+        //     return BadRequest("Could not save changes");
         await _context.SaveChangesAsync();
         await _cache.RemoveAsync($"auction:{id}");
 
         // await _publishEndpoint.Publish(updatedEvent);
         return Ok("Auction updated successfully");
     }
+
+// [Authorize(Roles = "Admin")]
+// [HttpPut("{id}")]
+// public async Task<IActionResult> UpdateAuction(Guid id, UpdateAuctionDto dto)
+// {
+//     var auction = await _context.Auctions
+//         .Include(x => x.Item)
+//         .FirstOrDefaultAsync(x => x.Id == id);
+
+//     if (auction == null) return NotFound();
+
+//     if (auction.AuctionEnd <= DateTime.UtcNow)
+//         return BadRequest("Ended auctions cannot be updated");
+
+//     // Update item fields
+//     auction.Item.Make = dto.Make ?? auction.Item.Make;
+//     auction.Item.Model = dto.Model ?? auction.Item.Model;
+//     auction.Item.Color = dto.Color ?? auction.Item.Color;
+//     auction.Item.Mileage = dto.Mileage ?? auction.Item.Mileage;
+//     auction.Item.Year = dto.Year ?? auction.Item.Year;
+//     auction.Item.ImageUrl = dto.ImageUrl ?? auction.Item.ImageUrl;
+
+//     // Update auction fields
+//     if (dto.AuctionEnd.HasValue)
+//         auction.AuctionEnd = dto.AuctionEnd.Value.ToUniversalTime();
+
+//     auction.ReservePrice = dto.ReservePrice ?? auction.ReservePrice;
+
+//     // ❗ DO NOT TOUCH CurrentHighBid here
+//     // ❗ DO NOT TOUCH WinningBidder here
+
+//     auction.UpdatedAt = DateTime.UtcNow;
+
+//     await _context.SaveChangesAsync();
+
+//     // Publish event (read-only snapshot)
+//     var updatedEvent = new AuctionUpdated
+//     {
+//         Id = auction.Id,
+//         Make = auction.Item.Make,
+//         Model = auction.Item.Model,
+//         Year = auction.Item.Year,
+//         Color = auction.Item.Color,
+//         Mileage = auction.Item.Mileage,
+//         AuctionEnd = auction.AuctionEnd,
+//         ReservePrice = auction.ReservePrice,
+//         CurrentHighBid = auction.CurrentHighBid,
+//         ImageUrl = auction.Item.ImageUrl
+//     };
+
+//     _context.OutboxMessages.Add(new OutboxMessage
+//     {
+//         Id = Guid.NewGuid(),
+//         Type = nameof(AuctionUpdated),
+//         Content = JsonSerializer.Serialize(updatedEvent)
+//     });
+
+//     await _context.SaveChangesAsync();
+//     await _cache.RemoveAsync($"auction:{id}");
+
+//     return Ok("Auction updated successfully");
+// }
+
 
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]

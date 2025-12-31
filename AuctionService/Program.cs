@@ -78,7 +78,7 @@ builder.Services.AddMassTransit(x =>
 
     // x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
     x.AddConsumer<BidPlacedConsumer>();
-    x.AddConsumer<HighBidRecalculatedConsumer>();
+    // x.AddConsumer<HighBidRecalculatedConsumer>();
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
     x.UsingRabbitMq((context, cfg) =>
     {

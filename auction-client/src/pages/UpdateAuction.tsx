@@ -288,25 +288,63 @@ export default function UpdateAuction() {
     return e;
   }
 
+  // async function onSubmit(e: React.FormEvent) {
+  //   e.preventDefault();
+  //   if (!id || !form) return;
+
+  //   const v = validate();
+  //   setErrors(v);
+  //   if (Object.keys(v).length > 0) return;
+
+  //   try {
+  //     setSaving(true);
+  //     await updateAuction(id, form);
+  //     nav("/auctions");
+  //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   } catch (err: any) {
+  //     setApiError(err?.response?.data?.message ?? "Update failed");
+  //   } finally {
+  //     setSaving(false);
+  //   }
+  // }
+
   async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!id || !form) return;
+  e.preventDefault();
+  if (!id || !form) return;
 
-    const v = validate();
-    setErrors(v);
-    if (Object.keys(v).length > 0) return;
+  const v = validate();
+  setErrors(v);
+  if (Object.keys(v).length > 0) return;
 
-    try {
-      setSaving(true);
-      await updateAuction(id, form);
-      nav("/auctions");
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      setApiError(err?.response?.data?.message ?? "Update failed");
-    } finally {
-      setSaving(false);
+  try {
+    setSaving(true);
+
+    // ✅ BUILD PAYLOAD SAFELY
+    const payload: Partial<CreateAuctionRequest> = {};
+
+    payload.make = form.make;
+    payload.model = form.model;
+    payload.color = form.color;
+    payload.imageUrl = form.imageUrl;
+    payload.year = form.year;
+    payload.mileage = form.mileage;
+    payload.auctionEnd = form.auctionEnd;
+
+    // 🚨 ONLY send reservePrice if user actually entered it
+    if (!Number.isNaN(form.reservePrice)) {
+      payload.reservePrice = form.reservePrice;
     }
+
+    await updateAuction(id, payload);
+    nav("/auctions");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    setApiError(err?.response?.data?.message ?? "Update failed");
+  } finally {
+    setSaving(false);
   }
+}
+
 
   if (!form) return <div className="p-2">Loading...</div>;
 
@@ -420,3 +458,73 @@ export default function UpdateAuction() {
     </div>
   );
 }
+
+
+// import { useState } from "react";
+// import { updateAuction } from "../api/auctionsClient";
+// import { useNavigate, useParams } from "react-router-dom";
+// import type { UpdateAuctionRequest } from "../types/dto";
+
+// export default function UpdateAuction() {
+//   const { id } = useParams<{ id: string }>();
+//   const navigate = useNavigate();
+
+//   const [form, setForm] = useState({
+//     make: "",
+//     model: "",
+//     year: "",
+//     color: "",
+//     mileage: "",
+//     imageUrl: "",
+//     reservePrice: "",
+//     auctionEnd: ""
+//   });
+
+//   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+//     setForm({ ...form, [e.target.name]: e.target.value });
+//   }
+
+//   async function handleSubmit(e: React.FormEvent) {
+//     e.preventDefault();
+
+//     const payload: UpdateAuctionRequest = {};
+
+//     if (form.make.trim()) payload.make = form.make;
+//     if (form.model.trim()) payload.model = form.model;
+//     if (form.color.trim()) payload.color = form.color;
+//     if (form.imageUrl.trim()) payload.imageUrl = form.imageUrl;
+
+//     if (form.year !== "")
+//       payload.year = Number(form.year);
+
+//     if (form.mileage !== "")
+//       payload.mileage = Number(form.mileage);
+
+//     // 🚨 CRITICAL FIX
+//     if (form.reservePrice !== "") {
+//       payload.reservePrice = Number(form.reservePrice);
+//     }
+
+//     // ✅ must be string (ISO)
+//     if (form.auctionEnd) {
+//       payload.auctionEnd = new Date(form.auctionEnd).toISOString();
+//     }
+
+//     await updateAuction(id!, payload);
+//     navigate("/auctions");
+//   }
+
+//   return (
+//     <form onSubmit={handleSubmit}>
+//       <input name="make" onChange={handleChange} />
+//       <input name="model" onChange={handleChange} />
+//       <input name="year" onChange={handleChange} />
+//       <input name="color" onChange={handleChange} />
+//       <input name="mileage" onChange={handleChange} />
+//       <input name="imageUrl" onChange={handleChange} />
+//       <input name="reservePrice" onChange={handleChange} />
+//       <input type="datetime-local" name="auctionEnd" onChange={handleChange} />
+//       <button type="submit">Update</button>
+//     </form>
+//   );
+// }
