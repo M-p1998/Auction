@@ -26,5 +26,5 @@ jobs:
         context: ./auction-client
         push: true
         tags: |
-          myap1998/auction-frontend:latest
-          myap1998/auction-frontend:${{ github.sha }}
+          mp5698/auction-frontend:latest
+          mp5698/auction-frontend:${{ github.sha }}
