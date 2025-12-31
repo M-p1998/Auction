@@ -183,7 +183,7 @@ public class AuctionController: ControllerBase
         // if (auction.Seller != User.Identity.Name)
         //     return Unauthorized("You cannot update another admin’s auction");
 
-        if (auction.AuctionEnd < DateTime.UtcNow)
+        if (auction.AuctionEnd <= DateTime.UtcNow)
             return BadRequest("Ended auctions cannot be updated");
         
         auction.Item.Make = updateAuctionDto.Make ?? auction.Item.Make;
