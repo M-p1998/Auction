@@ -108,7 +108,7 @@ public class BidsController : ControllerBase
     if (auctionSnapshot == null)
         return NotFound("Auction not found");
 
-    // ✅ Reserve price validation
+    // Reserve price validation
     if (request.Amount < auctionSnapshot.ReservePrice)
         return BadRequest("Bid must be greater than or equal to reserve price");
 

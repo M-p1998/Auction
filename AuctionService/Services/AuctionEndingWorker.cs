@@ -46,7 +46,8 @@ public class AuctionEndingWorker : BackgroundService
                 {
                     auction.Status = AuctionStatus.ReserveNotMet;
                     auction.SoldAmount = 0;
-                    auction.Winner = auction.WinningBidder;
+                    // auction.Winner = auction.WinningBidder;
+                    auction.Winner = null;
                 }
 
                 auction.UpdatedAt = DateTime.UtcNow;
