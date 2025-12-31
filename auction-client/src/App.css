@@ -474,3 +474,7 @@ button:disabled {
   background: #f3f4f6;
 }
 
+.input-disabled {
+  background-color: #f3f3f3;
+  cursor: not-allowed;
+}

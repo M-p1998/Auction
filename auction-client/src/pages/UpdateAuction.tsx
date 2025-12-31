@@ -331,9 +331,9 @@ export default function UpdateAuction() {
     payload.auctionEnd = form.auctionEnd;
 
     // 🚨 ONLY send reservePrice if user actually entered it
-    if (!Number.isNaN(form.reservePrice)) {
-      payload.reservePrice = form.reservePrice;
-    }
+    // if (!Number.isNaN(form.reservePrice)) {
+    //   payload.reservePrice = form.reservePrice;
+    // }
 
     await updateAuction(id, payload);
     nav("/auctions");
@@ -384,7 +384,10 @@ export default function UpdateAuction() {
                 type={type ?? "text"}
                 min={type === "number" ? 1 : undefined}
                 value={form[key] === 0 ? "" : form[key]}
-                onChange={e =>
+                disabled={key === "reservePrice"}   // 🔒 LOCK IT
+                className={key === "reservePrice" ? "input-disabled" : ""}
+                onChange={e =>{
+                  if (key === "reservePrice") return;
                   setForm({
                     ...form,
                     [key]:
@@ -394,7 +397,7 @@ export default function UpdateAuction() {
                           : +e.target.value
                         : e.target.value,
                   })
-                }
+                }}
               />
               {/* <input
                 type={type ?? "text"}

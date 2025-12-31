@@ -197,10 +197,10 @@ public class AuctionController: ControllerBase
         {
             auction.AuctionEnd = updateAuctionDto.AuctionEnd.Value.ToUniversalTime();
         }
-        if (updateAuctionDto.ReservePrice.HasValue)
-        {
-            auction.ReservePrice = updateAuctionDto.ReservePrice.Value;
-        }
+        // if (updateAuctionDto.ReservePrice.HasValue)
+        // {
+        //     auction.ReservePrice = updateAuctionDto.ReservePrice.Value;
+        // }
         
 
         // auction.ReservePrice= updateAuctionDto.ReservePrice ?? auction.ReservePrice;
