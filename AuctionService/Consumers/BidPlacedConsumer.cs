@@ -60,11 +60,11 @@ public class BidPlacedConsumer : IConsumer<BidPlaced>
 
         if (auction == null) return;
 
-        // 1️⃣ Reject bids after auction ends
+        // Reject bids after auction ends
         if (auction.AuctionEnd <= DateTime.UtcNow)
             return;
 
-        // 2️⃣ Reject bids below reserve price
+        // Reject bids below reserve price
         if (context.Message.Amount < auction.ReservePrice)
             return;
 
@@ -72,7 +72,7 @@ public class BidPlacedConsumer : IConsumer<BidPlaced>
         if (context.Message.Amount <= auction.CurrentHighBid)
             return;
 
-        // 3️⃣ Accept only higher valid bids
+        // Accept only higher valid bids
         // if (context.Message.Amount > auction.CurrentHighBid)
         // {
         //     auction.CurrentHighBid = context.Message.Amount;
@@ -98,6 +98,7 @@ public class BidPlacedConsumer : IConsumer<BidPlaced>
         auction.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+        
         
     }
 

@@ -301,7 +301,7 @@ public class AuctionController: ControllerBase
     // }
 
         auction.UpdatedAt = DateTime.UtcNow;
-        // await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync();
         // var success = await _context.SaveChangesAsync() > 0;
         // if (!success) return BadRequest("Could not save changes");
 
@@ -319,7 +319,7 @@ public class AuctionController: ControllerBase
             Color = auction.Item.Color,
             Mileage = auction.Item.Mileage,
             AuctionEnd   = auction.AuctionEnd,
-            // ReservePrice = auction.ReservePrice,
+            ReservePrice = auction.ReservePrice,
             CurrentHighBid = auction.CurrentHighBid,
             ImageUrl = auction.Item.ImageUrl
         };
@@ -338,10 +338,10 @@ public class AuctionController: ControllerBase
              Content = JsonSerializer.Serialize(updatedEvent),
          };
         _context.OutboxMessages.Add(outbox);
-        await _context.SaveChangesAsync();
-        // var success = await _context.SaveChangesAsync() > 0;
-        // if (!success)
-        //     return BadRequest("Could not save changes");
+        // await _context.SaveChangesAsync();
+        var success = await _context.SaveChangesAsync() > 0;
+        if (!success)
+            return BadRequest("Could not save changes");
         await _cache.RemoveAsync($"auction:{id}");
 
         // await _publishEndpoint.Publish(updatedEvent);
