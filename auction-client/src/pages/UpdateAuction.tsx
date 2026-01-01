@@ -339,7 +339,7 @@ export default function UpdateAuction() {
     nav("/auctions");
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (err: any) {
-    setApiError(err?.response?.data?.message ?? "Update failed");
+    setApiError(err?.response?.data?.message ?? "This auction can no longer be updated.");
   } finally {
     setSaving(false);
   }

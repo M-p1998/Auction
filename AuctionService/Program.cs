@@ -15,6 +15,7 @@ using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using AuctionService.Consumers;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -77,7 +78,7 @@ builder.Services.AddMassTransit(x =>
 
 
     // x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("search", false));
-    // x.AddConsumer<BidPlacedConsumer>();
+    x.AddConsumer<BidPlacedConsumer>();
     // x.AddConsumer<HighBidRecalculatedConsumer>();
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
     x.UsingRabbitMq((context, cfg) =>
