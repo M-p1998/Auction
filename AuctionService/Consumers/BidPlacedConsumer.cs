@@ -98,6 +98,19 @@ public class BidPlacedConsumer : IConsumer<BidPlaced>
         auction.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
+        await context.Publish(new AuctionUpdated
+        {
+            Id = auction.Id,
+            ReservePrice = auction.ReservePrice,
+            CurrentHighBid = auction.CurrentHighBid,
+            AuctionEnd = auction.AuctionEnd,
+            Make = auction.Item.Make,
+            Model = auction.Item.Model,
+            Year = auction.Item.Year,
+            Color = auction.Item.Color,
+            Mileage = auction.Item.Mileage,
+            ImageUrl = auction.Item.ImageUrl
+        });
         
         
     }
