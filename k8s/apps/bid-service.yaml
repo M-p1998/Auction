@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bid-service
+  namespace: auction
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bid-service
+  template:
+    metadata:
+      labels:
+        app: bid-service
+    spec:
+      containers:
+        - name: bid-service
+          image: mp5698/auction-bid-service:latest
+          ports:
+            - containerPort: 7003
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ASPNETCORE_URLS
+              value: http://+:7003
+
+            - name: JwtSettings__Key
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JwtSettings__Key
+
+            - name: RabbitMq__Host
+              value: rabbitmq
+            - name: RabbitMq__Username
+              value: guest
+            - name: RabbitMq__Password
+              value: guest
+
+            - name: ConnectionStrings__DefaultConnection
+              value: Host=postgres;Port=5432;Database=bids;Username=postgres;Password=bondstone
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bid-service
+  namespace: auction
+spec:
+  selector:
+    app: bid-service
+  ports:
+    - port: 7003

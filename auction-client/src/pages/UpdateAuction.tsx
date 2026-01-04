@@ -330,7 +330,7 @@ export default function UpdateAuction() {
     payload.mileage = form.mileage;
     payload.auctionEnd = form.auctionEnd;
 
-    // 🚨 ONLY send reservePrice if user actually entered it
+    // ONLY send reservePrice if user actually entered it
     // if (!Number.isNaN(form.reservePrice)) {
     //   payload.reservePrice = form.reservePrice;
     // }

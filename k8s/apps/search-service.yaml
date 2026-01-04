@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-service
+  namespace: auction
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: search-service
+  template:
+    metadata:
+      labels:
+        app: search-service
+    spec:
+      containers:
+        - name: search-service
+          image: mp5698/auction-search-service:latest
+          ports:
+            - containerPort: 7002
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ASPNETCORE_URLS
+              value: http://+:7002
+            - name: RabbitMq__Host
+              value: rabbitmq
+            - name: RabbitMq__Username
+              value: guest
+            - name: RabbitMq__Password
+              value: guest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-service
+  namespace: auction
+spec:
+  selector:
+    app: search-service
+  ports:
+    - port: 7002

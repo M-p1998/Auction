@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auction-service
+  namespace: auction
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: auction-service
+  template:
+    metadata:
+      labels:
+        app: auction-service
+    spec:
+      containers:
+        - name: auction-service
+          image: mp5698/auction-auction-service:latest
+          ports:
+            - containerPort: 7001
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ASPNETCORE_URLS
+              value: http://+:7001
+
+            - name: JwtSettings__Key
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JwtSettings__Key
+
+            - name: RabbitMq__Host
+              value: rabbitmq
+            - name: RabbitMq__Username
+              value: guest
+            - name: RabbitMq__Password
+              value: guest
+            - name: ConnectionStrings__DefaultConnection
+              value: Host=postgres;Port=5432;Database=auctions;Username=postgres;Password=bondstone
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auction-service
+  namespace: auction
+spec:
+  selector:
+    app: auction-service
+  ports:
+    - port: 7001
