@@ -57,8 +57,12 @@ builder.Services.AddHttpClient("auction", client =>
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddHealthChecks();
+
 
 var app = builder.Build();
+app.MapHealthChecks("/health/ready");
+app.MapHealthChecks("/health/live");
 
 app.UseRouting();
 

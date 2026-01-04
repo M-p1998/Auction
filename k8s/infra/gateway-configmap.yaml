@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gateway-config
+  namespace: auction
+data:
+  appsettings.Production.json: |
+    {
+      "ReverseProxy": {
+        "Routes": {
+          "auction-route": {
+            "ClusterId": "auction-cluster",
+            "Match": { "Path": "/api/auctions/{**catch-all}" }
+          },
+          "search-route": {
+            "ClusterId": "search-cluster",
+            "Match": { "Path": "/api/search/{**catch-all}" }
+          },
+          "bid-route": {
+            "ClusterId": "bid-cluster",
+            "Match": { "Path": "/api/bids/{**catch-all}" }
+          },
+          "auth-route": {
+            "ClusterId": "auction-cluster",
+            "Match": { "Path": "/api/auth/{**catch-all}" }
+          }
+        },
+        "Clusters": {
+          "auction-cluster": {
+            "Destinations": {
+              "auction-api": {
+                "Address": "http://auction-service:7001/"
+              }
+            }
+          },
+          "search-cluster": {
+            "Destinations": {
+              "search-api": {
+                "Address": "http://search-service:7002/"
+              }
+            }
+          },
+          "bid-cluster": {
+            "Destinations": {
+              "bid-api": {
+                "Address": "http://bid-service:7003/"
+              }
+            }
+          }
+        }
+      }
+    }

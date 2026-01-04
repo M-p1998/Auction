@@ -43,9 +43,12 @@ builder.Services
 builder.Services.AddAuthorization();
                             
 var app = builder.Build();
+builder.Services.AddHealthChecks();
 
 // CORS before proxy
 app.UseCors("AllowFrontend");
+app.MapHealthChecks("/health/live");
+app.MapHealthChecks("/health/ready");
 
 // app.UseAuthentication();
 // app.UseAuthorization();

@@ -13,14 +13,22 @@ spec:
       labels:
         app: gateway-service
     spec:
+      volumes:
+        - name: gateway-config-vol
+          configMap:
+            name: gateway-config
       containers:
         - name: gateway-service
           image: mp5698/auction-gateway-service:latest
+          volumeMounts:
+            - name: gateway-config-vol
+              mountPath: /app/appsettings.Production.json
+              subPath: appsettings.Production.json
           ports:
             - containerPort: 6001
           env:
             - name: ASPNETCORE_ENVIRONMENT
-              value: Development
+              value: Production
             - name: ASPNETCORE_URLS
               value: http://+:6001
             
@@ -29,6 +37,28 @@ spec:
                 secretKeyRef:
                   name: jwt-secret
                   key: JwtSettings__Key
+
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 6001
+            initialDelaySeconds: 20
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 6001
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
 
 ---
 apiVersion: v1
@@ -41,3 +71,7 @@ spec:
     app: gateway-service
   ports:
     - port: 6001
+      targetPort: 6001
+
+
+

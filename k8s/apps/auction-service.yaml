@@ -38,6 +38,29 @@ spec:
               value: guest
             - name: ConnectionStrings__DefaultConnection
               value: Host=postgres;Port=5432;Database=auctions;Username=postgres;Password=bondstone
+
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 7001
+            initialDelaySeconds: 20
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 7001
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+
 ---
 apiVersion: v1
 kind: Service
@@ -49,3 +72,6 @@ spec:
     app: auction-service
   ports:
     - port: 7001
+      targetPort: 7001
+
+

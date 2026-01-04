@@ -22,6 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add Controllers + FluentValidation
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks();
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 
@@ -119,6 +120,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
 try
 {
     // Initialize PostgreSQL DB
@@ -141,6 +143,9 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AuctionDbContext>();
     db.Database.Migrate();
 }
+
+app.MapHealthChecks("/health/live");
+app.MapHealthChecks("/health/ready");
 
 app.Run();
 
