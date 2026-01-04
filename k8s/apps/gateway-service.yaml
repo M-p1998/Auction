@@ -20,7 +20,7 @@ spec:
             - containerPort: 6001
           env:
             - name: ASPNETCORE_ENVIRONMENT
-              value: Production
+              value: Development
             - name: ASPNETCORE_URLS
               value: http://+:6001
             
