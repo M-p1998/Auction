@@ -5,8 +5,23 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false)
+    .AddJsonFile("appsettings.Production.json", optional: true)
+    .AddJsonFile("/app/config/appsettings.Production.json", optional: true)
+    .AddEnvironmentVariables();
+
+
 // JWT Authentication
-var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]);
+// var key = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]);
+var jwtKey = builder.Configuration["JwtSettings:Key"];
+if (string.IsNullOrEmpty(jwtKey))
+{
+    throw new Exception("JwtSettings:Key is missing");
+}
+
+var key = Encoding.UTF8.GetBytes(jwtKey);
+
 
 // CORS
 builder.Services.AddCors(options =>
@@ -41,9 +56,9 @@ builder.Services
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 builder.Services.AddAuthorization();
-                            
+builder.Services.AddHealthChecks();  
+
 var app = builder.Build();
-builder.Services.AddHealthChecks();
 
 // CORS before proxy
 app.UseCors("AllowFrontend");
