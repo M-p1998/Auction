@@ -14,19 +14,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+      # Install + auth doctl (so kubeconfig exec works)
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
         with:
-          version: v1.29.0
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-      - name: Configure kubeconfig (persist it)
+      - name: Fetch kubeconfig for DOKS
         run: |
-          mkdir -p ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
-          chmod 600 ~/.kube/config
+          doctl kubernetes cluster kubeconfig save ${{ secrets.DO_CLUSTER_ID }}
           kubectl cluster-info
-          kubectl get ns
+          kubectl get nodes
 
-      - name: Deploy frontend
+      - name: Deploy frontend manifests
         run: |
           kubectl apply -f k8s/frontend/
+          kubectl -n auction get pods
+          kubectl -n auction get ingress

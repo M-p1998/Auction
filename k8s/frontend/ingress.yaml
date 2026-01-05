@@ -6,7 +6,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: app.auctionapp.online
+    - host: auctionapp.online
       http:
         paths:
           - path: /
