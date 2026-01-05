@@ -29,19 +29,28 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set kubeconfig
+      # Install doctl
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      # Setup kubeconfig
+      - name: Configure kubeconfig
         run: |
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
 
-      - name: Update images + apply
+      - name: Verify cluster access
+        run: kubectl get nodes
+
+      - name: Deploy to Kubernetes
         run: |
-          kubectl -n auction set image deployment/auction-service auction-service=mp5698/auction-auction-service:${{ github.sha }}
-          kubectl -n auction set image deployment/gateway-service gateway-service=mp5698/auction-gateway-service:${{ github.sha }}
-
           kubectl apply -f k8s/infra
           kubectl apply -f k8s/apps
           kubectl apply -f k8s/frontend
