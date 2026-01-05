@@ -28,6 +28,5 @@ jobs:
 
       - name: Deploy frontend manifests
         run: |
-          kubectl apply -f k8s/frontend/
-          kubectl -n auction get pods
-          kubectl -n auction get ingress
+          kubectl apply -f k8s/frontend/ --validate=false
+

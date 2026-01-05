@@ -1,10 +1,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: auction-frontend-ingress
+  name: auction-ingress
   namespace: auction
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   ingressClassName: nginx
+  tls:
+    - hosts:
+        - auctionapp.online
+        - api.auctionapp.online
+      secretName: auction-tls
   rules:
     - host: auctionapp.online
       http:
@@ -16,8 +24,10 @@ spec:
                 name: auction-frontend
                 port:
                   number: 80
-
-          - path: /api
+    - host: api.auctionapp.online
+      http:
+        paths:
+          - path: /
             pathType: Prefix
             backend:
               service:

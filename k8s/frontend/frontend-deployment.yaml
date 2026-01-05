@@ -16,6 +16,5 @@ spec:
       containers:
         - name: auction-frontend
           image: mp5698/auction-frontend:latest
-          imagePullPolicy: Always
           ports:
             - containerPort: 80
