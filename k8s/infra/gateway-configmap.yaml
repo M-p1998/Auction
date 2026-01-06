@@ -6,9 +6,7 @@ metadata:
 data:
   appsettings.Production.json: |
     {
-      "JwtSettings": {
-        "Key": "__PLACEHOLDER__"
-      },
+      
       "ReverseProxy": {
         "Routes": {
           "auction-route": {

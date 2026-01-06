@@ -22,7 +22,7 @@ spec:
           image: mp5698/auction-gateway-service:latest
           volumeMounts:
             - name: gateway-config-vol
-              mountPath: /app/config
+              mountPath: /app/config/appsettings.Production.json
               subPath: appsettings.Production.json
           ports:
             - containerPort: 6001
