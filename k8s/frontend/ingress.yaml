@@ -8,11 +8,6 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   ingressClassName: nginx
-  tls:
-    - hosts:
-        - auctionapp.online
-        - api.auctionapp.online
-      secretName: auction-tls
   rules:
     - host: auctionapp.online
       http:

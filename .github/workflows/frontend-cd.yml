@@ -28,5 +28,7 @@ jobs:
 
       - name: Deploy frontend manifests
         run: |
-          kubectl apply -f k8s/frontend/ --validate=false
+          kubectl apply -f k8s/frontend/frontend-deployment.yaml
+          kubectl apply -f k8s/frontend/frontend-service.yaml
+          kubectl apply -f k8s/frontend/ingress.yaml
 
