@@ -1,0 +1,11 @@
+**/bin
+**/obj
+**/.vs
+**/.idea
+**/.vscode
+**/node_modules
+.git
+.gitignore
+docker-compose.yml
+k8s
+auction-client

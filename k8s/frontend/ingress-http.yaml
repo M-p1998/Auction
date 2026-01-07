@@ -1,24 +1,25 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: auction-ingress
+  name: auction-ingress-http
   namespace: auction
   annotations:
+    kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   ingressClassName: nginx
-
-  tls:
-    - hosts:
-        - auctionapp.online
-        - api.auctionapp.online
-      secretName: auction-tls
-
   rules:
     - host: auctionapp.online
       http:
         paths:
+          - path: /.well-known/acme-challenge/
+            pathType: Prefix
+            backend:
+              service:
+                name: cm-acme-http-solver
+                port:
+                  number: 8089
           - path: /
             pathType: Prefix
             backend:
@@ -30,6 +31,13 @@ spec:
     - host: api.auctionapp.online
       http:
         paths:
+          - path: /.well-known/acme-challenge/
+            pathType: Prefix
+            backend:
+              service:
+                name: cm-acme-http-solver
+                port:
+                  number: 8089
           - path: /
             pathType: Prefix
             backend:

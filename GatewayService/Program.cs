@@ -29,10 +29,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173")
+            .WithOrigins(
+                "https://auctionapp.online",
+                "http://localhost:5173")
             .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
+            .AllowAnyMethod();
+         
     });
 });
 
@@ -59,14 +61,15 @@ builder.Services.AddAuthorization();
 builder.Services.AddHealthChecks();  
 
 var app = builder.Build();
+app.UseRouting();
 
 // CORS before proxy
 app.UseCors("AllowFrontend");
 app.MapHealthChecks("/health/live");
 app.MapHealthChecks("/health/ready");
 
-// app.UseAuthentication();
-// app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Route everything through Gateway
 app.MapReverseProxy();

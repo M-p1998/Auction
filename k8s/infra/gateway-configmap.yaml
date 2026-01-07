@@ -47,6 +47,11 @@ data:
                 "Address": "http://bid-service:7003/"
               }
             }
+          },
+          "auth-cluster": {
+            "Destinations": {
+              "auth-api": { "Address": "http://auth-service:7004/" }
+            }
           }
         }
       }
