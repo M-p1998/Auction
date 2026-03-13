@@ -34,7 +34,8 @@ export default function RegisterUser() {
       navigate("/login");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (ex: any) {
-      setErr(ex?.response?.data ?? "Register failed");
+      // setErr(ex?.response?.data ?? "Register failed");
+      setErr(ex?.response?.data?.message ?? ex?.response?.data ?? "Register failed");
     }
   }
 
