@@ -475,3 +475,10 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+
+# Eclipse
+.metadata/
+.project
+.classpath
+.settings/
