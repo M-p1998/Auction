@@ -33,10 +33,21 @@ export default function RegisterUser() {
       alert("Registration successful! Please log in.");
       navigate("/login");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (ex: any) {
-      // setErr(ex?.response?.data ?? "Register failed");
-      setErr(ex?.response?.data?.message ?? ex?.response?.data ?? "Register failed");
+    } 
+    // catch (ex: any) {
+    //   // setErr(ex?.response?.data ?? "Register failed");
+    //   setErr(ex?.response?.data?.message ?? ex?.response?.data ?? "Register failed");
+    // }
+    catch (ex: any) {
+    const data = ex?.response?.data;
+    const errors = data?.errors;
+    if (errors) {
+      const firstError = Object.values(errors).flat()[0];
+      setErr(firstError as string);
+    } else {
+      setErr(data?.title ?? data?.message ?? "Register failed");
     }
+  }
   }
 
   return (
